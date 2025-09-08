@@ -106,4 +106,8 @@ export const authOptions: NextAuthOptions = {
     error: '/auth/error',
   },
   secret: process.env.NEXTAUTH_SECRET,
+  // CRITICAL: Add NEXTAUTH_URL configuration
+  ...(process.env.NEXTAUTH_URL && { 
+    url: process.env.NEXTAUTH_URL 
+  }),
 };

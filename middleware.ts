@@ -21,8 +21,10 @@ export default withAuth(
 
 export const config = {
   matcher: [
+    // Only protect authenticated routes, allow public access to homepage and auth
     '/dashboard/:path*',
     '/workflows/:path*',
+    // API routes that require authentication - but NOT /api/auth/*
     '/api/workflows/:path*',
     '/api/executions/:path*',
     '/api/nodes/:path*'
