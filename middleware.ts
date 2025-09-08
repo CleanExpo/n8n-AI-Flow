@@ -1,12 +1,30 @@
+import { withAuth } from 'next-auth/middleware';
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
 
-export async function middleware(req: NextRequest) {
-  return NextResponse.next();
-}
+export default withAuth(
+  function middleware(req) {
+    return NextResponse.next();
+  },
+  {
+    callbacks: {
+      authorized: ({ req, token }) => {
+        // Protect all routes under /dashboard and /workflows
+        if (req.nextUrl.pathname.startsWith('/dashboard') || 
+            req.nextUrl.pathname.startsWith('/workflows')) {
+          return !!token;
+        }
+        return true;
+      }
+    }
+  }
+);
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|auth).*)',
-  ],
+    '/dashboard/:path*',
+    '/workflows/:path*',
+    '/api/workflows/:path*',
+    '/api/executions/:path*',
+    '/api/nodes/:path*'
+  ]
 };

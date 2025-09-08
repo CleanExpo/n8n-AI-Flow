@@ -1,0 +1,22 @@
+{
+  "timestamp": "2025-09-08T19:33:26.969Z",
+  "issues": [
+    "Missing mobile menu button"
+  ],
+  "improvements": [
+    "Add loading skeletons for better UX during data fetching",
+    "Implement progressive enhancement for slower connections",
+    "Add aria-labels for better screen reader support"
+  ],
+  "metrics": {
+    "domContentLoaded": 2696,
+    "loadComplete": 2696
+  },
+  "contrastIssues": [],
+  "buttonAnalysis": {
+    "total": 0,
+    "tooSmall": 0,
+    "goodSize": 0
+  },
+  "mobileTextIssues": 0
+}
