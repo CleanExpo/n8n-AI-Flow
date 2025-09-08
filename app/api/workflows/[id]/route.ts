@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@/lib/supabase/client';
+import { createAdminClient } from '@/lib/supabase/client';
 import { WorkflowService } from '@/lib/services/workflow.service';
 import { UpdateWorkflowDTO } from '@/lib/types/database';
+import { getServerSession } from 'next-auth';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -12,13 +13,23 @@ interface RouteParams {
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    // Check authentication
+    const session = await getServerSession();
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const { id } = await params;
-    const supabase = await createRouteHandlerClient();
+    const supabase = createAdminClient();
     const workflowService = new WorkflowService(supabase);
 
     const { data, error } = await workflowService.getWorkflowWithNodes(id);
 
     if (error) {
+      console.error('Get workflow error:', error);
       return NextResponse.json(
         { error: error.message },
         { status: 400 }
@@ -47,8 +58,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  */
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
+    const session = await getServerSession();
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const { id } = await params;
-    const supabase = await createRouteHandlerClient();
+    const supabase = createAdminClient();
     const workflowService = new WorkflowService(supabase);
 
     const body: UpdateWorkflowDTO = await request.json();
@@ -84,8 +103,16 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
+    const session = await getServerSession();
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const { id } = await params;
-    const supabase = await createRouteHandlerClient();
+    const supabase = createAdminClient();
     const workflowService = new WorkflowService(supabase);
 
     const { data, error } = await workflowService.deleteWorkflow(id);

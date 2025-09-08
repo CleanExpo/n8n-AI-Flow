@@ -51,6 +51,11 @@ export class WorkflowService {
         .select('*')
         .order('created_at', { ascending: false });
 
+      // Filter by user_id if provided
+      if (filter?.userId) {
+        query = query.eq('user_id', filter.userId);
+      }
+
       if (filter?.status) {
         query = query.eq('status', filter.status);
       }

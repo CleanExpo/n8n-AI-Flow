@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createRouteHandlerClient } from '@/lib/supabase/client';
+import { createAdminClient } from '@/lib/supabase/client';
 import { ExecutionService } from '@/lib/services/execution.service';
+import { getServerSession } from 'next-auth';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -11,8 +12,17 @@ interface RouteParams {
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
+    // Check authentication
+    const session = await getServerSession();
+    if (!session?.user?.email) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const { id } = await params;
-    const supabase = await createRouteHandlerClient();
+    const supabase = createAdminClient();
     const executionService = new ExecutionService(supabase);
 
     const { data, error } = await executionService.getExecutionLogs(id);

@@ -5,26 +5,25 @@ import { WorkflowCanvas } from '@/components/workflow/WorkflowCanvas';
 import { useWorkflowStore } from '@/lib/stores/workflow-store';
 import { Toaster } from 'react-hot-toast';
 import toast from 'react-hot-toast';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { Session } from '@supabase/supabase-js';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function WorkflowsPage() {
-  const supabase = createClientComponentClient();
-  const [session, setSession] = useState<Session | null>(null);
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [workflows, setWorkflows] = useState<any[]>([]);
   const [selectedWorkflowId, setSelectedWorkflowId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const { loadWorkflow, reset, workflow } = useWorkflowStore();
 
-  // Check session
+  // Check authentication
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session) {
-        fetchWorkflows();
-      }
-    });
-  }, [supabase]);
+    if (status === 'unauthenticated') {
+      router.push('/auth/signin');
+    } else if (status === 'authenticated') {
+      fetchWorkflows();
+    }
+  }, [status, router]);
 
   const fetchWorkflows = async () => {
     try {
@@ -95,7 +94,18 @@ export default function WorkflowsPage() {
     }
   };
 
-  if (!session) {
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-lg text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === 'unauthenticated') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
