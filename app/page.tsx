@@ -1,6 +1,7 @@
 'use client';
 
-import { createClientComponentClient, Session } from '@supabase/auth-helpers-nextjs';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { Session } from '@supabase/supabase-js';
 import { useState, useEffect } from 'react';
 
 export default function Home() {
@@ -24,6 +25,9 @@ export default function Home() {
   async function handleLogin() {
     await supabase.auth.signInWithOAuth({
       provider: 'github',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`
+      }
     });
   }
 
