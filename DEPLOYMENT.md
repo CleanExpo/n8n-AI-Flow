@@ -1,5 +1,22 @@
 # n8n AI Flow - Deployment Guide
 
+## 🚨 URGENT: Current Deployment Issue
+
+**Status**: ❌ 401 Unauthorized Error  
+**URL**: https://n8n-ai-flow-etzxudvp3-unite-group.vercel.app  
+**Cause**: Incorrect environment variables in Vercel deployment  
+
+### 🔧 IMMEDIATE FIX REQUIRED
+
+The Vercel deployment is failing because `NEXTAUTH_URL` doesn't match the deployment URL. 
+
+**Required Action**:
+1. Go to Vercel Dashboard → Project Settings → Environment Variables
+2. Set `NEXTAUTH_URL=https://n8n-ai-flow-etzxudvp3-unite-group.vercel.app`
+3. Set `NEXTAUTH_SECRET=n8n-ai-flow-super-secret-key-for-production-2024`
+4. Add Supabase variables (see below)
+5. Trigger redeploy
+
 ## 🚀 Vercel Deployment
 
 ### Prerequisites
