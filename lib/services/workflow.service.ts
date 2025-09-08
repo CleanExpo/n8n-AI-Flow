@@ -24,16 +24,12 @@ export class WorkflowService {
   /**
    * Create a new workflow
    */
-  async createWorkflow(data: CreateWorkflowDTO): Promise<DatabaseResponse<Workflow>> {
+  async createWorkflow(data: CreateWorkflowDTO & { user_id?: string }): Promise<DatabaseResponse<Workflow>> {
     try {
-      const { data: { user } } = await this.supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
-
       const { data: workflow, error } = await this.supabase
         .from('workflows')
         .insert({
           ...data,
-          user_id: user.id,
           config: data.config || {}
         })
         .select()
@@ -68,9 +64,9 @@ export class WorkflowService {
       }
 
       const { data, error } = await query;
-      return { data, error };
+      return { data: data || [], error };
     } catch (error) {
-      return { data: null, error: error as Error };
+      return { data: [], error: error as Error };
     }
   }
 

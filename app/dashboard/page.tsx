@@ -67,7 +67,8 @@ export default function DashboardPage() {
       // Fetch workflows
       const workflowsRes = await fetch('/api/workflows');
       if (workflowsRes.ok) {
-        const workflowsData = await workflowsRes.json();
+        const workflowsResponse = await workflowsRes.json();
+        const workflowsData = workflowsResponse.data || [];
         setWorkflows(workflowsData.slice(0, 5)); // Show latest 5
         
         // Calculate stats
@@ -75,7 +76,7 @@ export default function DashboardPage() {
           totalWorkflows: workflowsData.length,
           activeWorkflows: workflowsData.filter((w: any) => w.status === 'active').length,
           totalExecutions: workflowsData.reduce((acc: number, w: any) => acc + (w.executionCount || 0), 0),
-          successRate: 95 // Mock for now
+          successRate: workflowsData.length > 0 ? 95 : 0 // Mock for now
         });
       }
     } catch (error) {
