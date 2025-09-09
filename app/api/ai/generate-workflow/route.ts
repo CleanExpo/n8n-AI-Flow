@@ -26,7 +26,7 @@ async function generateWorkflowFromPrompt(
     workflow.nodes.push({
       id: 'gmail_trigger',
       type: 'n8n-nodes-base.gmailTrigger',
-      position: [250, 300],
+      position: { x: 250, y: 300 },
       parameters: {
         pollTimes: { item: [{ mode: 'everyMinute' }] }
       }
@@ -37,7 +37,7 @@ async function generateWorkflowFromPrompt(
     workflow.nodes.push({
       id: 'slack_node',
       type: 'n8n-nodes-base.slack',
-      position: [450, 300],
+      position: { x: 450, y: 300 },
       parameters: {
         channel: '#general',
         text: 'Notification from automated workflow'
@@ -49,7 +49,7 @@ async function generateWorkflowFromPrompt(
     workflow.nodes.push({
       id: 'sheets_node',
       type: 'n8n-nodes-base.googleSheets',
-      position: [650, 300],
+      position: { x: 650, y: 300 },
       parameters: {
         operation: 'append',
         sheetId: ''
@@ -61,7 +61,7 @@ async function generateWorkflowFromPrompt(
     workflow.nodes.push({
       id: 'webhook_trigger',
       type: 'n8n-nodes-base.webhook',
-      position: [250, 300],
+      position: { x: 250, y: 300 },
       parameters: {
         path: 'webhook-path',
         responseMode: 'onReceived',
@@ -74,7 +74,7 @@ async function generateWorkflowFromPrompt(
     workflow.nodes.push({
       id: 'http_request',
       type: 'n8n-nodes-base.httpRequest',
-      position: [450, 300],
+      position: { x: 450, y: 300 },
       parameters: {
         method: 'GET',
         url: '',
@@ -87,7 +87,7 @@ async function generateWorkflowFromPrompt(
     workflow.nodes.push({
       id: 'database_node',
       type: 'n8n-nodes-base.postgres',
-      position: [650, 300],
+      position: { x: 650, y: 300 },
       parameters: {
         operation: 'executeQuery'
       }
@@ -101,7 +101,7 @@ async function generateWorkflowFromPrompt(
         workflow.nodes.push({
           id: `image_process_${Date.now()}`,
           type: 'n8n-nodes-base.imageResize',
-          position: [450, 500],
+          position: { x: 450, y: 500 },
           parameters: {
             operation: 'resize',
             width: 800
@@ -116,7 +116,7 @@ async function generateWorkflowFromPrompt(
           workflow.nodes.push({
             id: `json_parser_${Date.now()}`,
             type: 'n8n-nodes-base.set',
-            position: [450, 400],
+            position: { x: 450, y: 400 },
             parameters: {
               values: { string: [], number: [], boolean: [] }
             }
@@ -127,7 +127,7 @@ async function generateWorkflowFromPrompt(
             workflow.nodes.push({
               id: `csv_parser_${Date.now()}`,
               type: 'n8n-nodes-base.spreadsheetFile',
-              position: [450, 400],
+              position: { x: 450, y: 400 },
               parameters: {
                 operation: 'fromFile'
               }
@@ -156,13 +156,13 @@ async function generateWorkflowFromPrompt(
       {
         id: 'start',
         type: 'n8n-nodes-base.start',
-        position: [250, 300],
+        position: { x: 250, y: 300 },
         parameters: {}
       },
       {
         id: 'set_data',
         type: 'n8n-nodes-base.set',
-        position: [450, 300],
+        position: { x: 450, y: 300 },
         parameters: {
           values: {
             string: [
