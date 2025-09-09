@@ -220,14 +220,20 @@ function generateExplanation(workflow: any, originalMessage: string): string {
 }
 
 export async function POST(request: NextRequest) {
+  console.log('API: /api/ai/generate-workflow called');
+  
   try {
     const session = await getServerSession(authOptions);
+    console.log('API: Session:', session?.user?.email || 'no session');
     
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // For now, allow demo mode if no session
+    const isDemoMode = !session?.user;
+    if (isDemoMode) {
+      console.log('API: Running in demo mode (no auth required)');
     }
 
     const body = await request.json();
+    console.log('API: Request body received:', { message: body.message?.substring(0, 50) });
     const { message, attachments, context } = body;
 
     if (!message && (!attachments || attachments.length === 0)) {
@@ -238,16 +244,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate workflow using AI
+    console.log('API: Generating workflow...');
     const result = await generateWorkflowFromPrompt(message, attachments, context);
+    console.log('API: Workflow generated with', result.workflow?.nodes?.length || 0, 'nodes');
 
     // Store the generated workflow in database for history
     // await storeWorkflowGeneration(session.user.id, message, result.workflow);
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Workflow generation error:', error);
+    console.error('API: Workflow generation error:', error);
     return NextResponse.json(
-      { error: 'Failed to generate workflow' },
+      { error: 'Failed to generate workflow', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

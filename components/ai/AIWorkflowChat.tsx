@@ -127,7 +127,11 @@ export function AIWorkflowChat({
   }, []);
 
   const handleSendMessage = async () => {
-    if (!input.trim() && attachments.length === 0 && selectedFiles.length === 0) return;
+    console.log('handleSendMessage called with input:', input);
+    if (!input.trim() && attachments.length === 0 && selectedFiles.length === 0) {
+      console.log('No input or attachments, returning');
+      return;
+    }
 
     // Process all file sources
     let allExtractedContent = [...extractedContents];
@@ -162,16 +166,24 @@ export function AIWorkflowChat({
     setIsProcessing(true);
 
     try {
-      // Generate workflow using smart document parser
-      const generatedWorkflow = await documentParser.generateWorkflowFromContent(
-        allExtractedContent,
-        input
-      );
+      console.log('Sending request to /api/ai/generate-workflow');
+      
+      // Skip document parser for now to debug API call
+      let generatedWorkflow = null;
+      try {
+        generatedWorkflow = await documentParser.generateWorkflowFromContent(
+          allExtractedContent,
+          input
+        );
+      } catch (parserError) {
+        console.warn('Document parser error (non-fatal):', parserError);
+      }
 
-      // Also call the existing API for compatibility
+      // Call the API
       const response = await fetch('/api/ai/generate-workflow', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Include cookies for authentication
         body: JSON.stringify({
           message: input,
           attachments: userMessage.attachments,
@@ -180,7 +192,17 @@ export function AIWorkflowChat({
         })
       });
 
+      console.log('API Response status:', response.status);
+      
+      if (!response.ok) {
+        console.error('API Error:', response.status, response.statusText);
+        const errorText = await response.text();
+        console.error('Error details:', errorText);
+        throw new Error(`API returned ${response.status}: ${errorText}`);
+      }
+      
       const apiData = await response.json();
+      console.log('API Data received:', apiData);
 
       const aiResponse: Message = {
         id: Date.now().toString(),
@@ -199,10 +221,11 @@ export function AIWorkflowChat({
         onWorkflowGenerated(apiData.workflow || generatedWorkflow);
       }
     } catch (error) {
+      console.error('Error in handleSendMessage:', error);
       const errorMessage: Message = {
         id: Date.now().toString(),
         role: 'assistant',
-        content: 'I encountered an error while analyzing your documents and generating the workflow. Please try again or check your files.',
+        content: `Error generating workflow: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
         timestamp: new Date(),
         status: 'error'
       };
@@ -662,8 +685,17 @@ export function AIWorkflowChat({
             <input
               type="text"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+              onChange={(e) => {
+                console.log('Input changed to:', e.target.value);
+                setInput(e.target.value);
+              }}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  console.log('Enter pressed, calling handleSendMessage');
+                  handleSendMessage();
+                }
+              }}
               onPaste={handlePaste}
               placeholder="Describe your workflow or drag files here..."
               className="flex-1 bg-transparent outline-none text-sm"
@@ -703,8 +735,11 @@ export function AIWorkflowChat({
           </div>
 
           <Button
-            onClick={handleSendMessage}
-            disabled={isProcessing || (!input.trim() && attachments.length === 0)}
+            onClick={() => {
+              console.log('Send button clicked');
+              handleSendMessage();
+            }}
+            disabled={isProcessing}
           >
             {isProcessing ? (
               <Loader2 className="h-4 w-4 animate-spin" />
