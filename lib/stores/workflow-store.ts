@@ -31,6 +31,8 @@ interface WorkflowState {
   setSelectedNode: (node: Node | null) => void;
   
   // Edge operations
+  addEdge: (edge: Edge) => void;
+  updateEdge: (edgeId: string, data: Partial<Edge>) => void;
   deleteEdge: (edgeId: string) => void;
   
   // Workflow operations
@@ -140,6 +142,20 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
   },
 
   // Edge operations
+  addEdge: (edge) => {
+    set((state) => ({
+      edges: [...state.edges, edge],
+    }));
+  },
+
+  updateEdge: (edgeId, data) => {
+    set((state) => ({
+      edges: state.edges.map((edge) =>
+        edge.id === edgeId ? { ...edge, ...data } : edge
+      ),
+    }));
+  },
+
   deleteEdge: (edgeId) => {
     set((state) => ({
       edges: state.edges.filter((edge) => edge.id !== edgeId),
