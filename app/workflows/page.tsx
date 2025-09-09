@@ -7,6 +7,8 @@ import { Toaster } from 'react-hot-toast';
 import toast from 'react-hot-toast';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { ChevronRight } from 'lucide-react';
 
 export default function WorkflowsPage() {
   const { data: session, status } = useSession();
@@ -123,10 +125,22 @@ export default function WorkflowsPage() {
       <Toaster position="top-right" />
       
       {/* Sidebar */}
-      <div className="w-64 bg-white shadow-lg p-6 overflow-y-auto">
-        <h2 className="text-xl font-bold mb-4">Workflows</h2>
+      <div className="w-64 bg-white shadow-lg overflow-y-auto">
+        {/* Breadcrumb */}
+        <div className="p-4 border-b">
+          <nav className="flex items-center space-x-2 text-sm">
+            <Link href="/dashboard" className="text-gray-500 hover:text-gray-700">
+              Dashboard
+            </Link>
+            <ChevronRight className="h-4 w-4 text-gray-400" />
+            <span className="text-gray-900 font-medium">Workflows</span>
+          </nav>
+        </div>
         
-        <button
+        <div className="p-6">
+          <h2 className="text-xl font-bold mb-4">Workflows</h2>
+          
+          <button
           onClick={handleCreateWorkflow}
           disabled={isCreating}
           className="w-full mb-4 bg-blue-500 text-white rounded-lg py-2 hover:bg-blue-600 transition-colors disabled:opacity-50"
@@ -176,6 +190,7 @@ export default function WorkflowsPage() {
               No workflows yet. Create your first workflow to get started.
             </div>
           )}
+        </div>
         </div>
       </div>
 

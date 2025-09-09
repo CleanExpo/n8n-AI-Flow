@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { WorkflowCanvas } from '@/components/workflow/WorkflowCanvas';
 import { ExecutionMonitor } from '@/components/workflow/ExecutionMonitor';
@@ -20,17 +20,18 @@ import {
   Workflow as WorkflowIcon,
   ToggleLeft,
   ToggleRight,
-  RefreshCw
+  RefreshCw,
+  ChevronRight
 } from 'lucide-react';
 
 interface PageProps {
-  params: Promise<{
+  params: {
     id: string;
-  }>;
+  };
 }
 
 export default function WorkflowEditorPage({ params }: PageProps) {
-  const { id } = use(params);
+  const { id } = params;
   const router = useRouter();
   const { toast } = useToast();
   
@@ -195,8 +196,21 @@ export default function WorkflowEditorPage({ params }: PageProps) {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b bg-background">
         <div className="flex items-center space-x-4">
-          <WorkflowIcon className="h-6 w-6" />
-          <h1 className="text-xl font-semibold">{workflow.name}</h1>
+          {/* Breadcrumb */}
+          <nav className="flex items-center space-x-2 text-sm">
+            <a href="/dashboard" className="text-gray-500 hover:text-gray-700">
+              Dashboard
+            </a>
+            <ChevronRight className="h-4 w-4 text-gray-400" />
+            <a href="/workflows" className="text-gray-500 hover:text-gray-700">
+              Workflows
+            </a>
+            <ChevronRight className="h-4 w-4 text-gray-400" />
+            <span className="text-gray-900 font-medium">{workflow.name}</span>
+          </nav>
+        </div>
+        
+        <div className="flex items-center space-x-2">
           <Badge variant={workflow.status === 'active' ? 'default' : 'secondary'}>
             {workflow.status}
           </Badge>
@@ -206,9 +220,6 @@ export default function WorkflowEditorPage({ params }: PageProps) {
               <span>Synced</span>
             </Badge>
           )}
-        </div>
-        
-        <div className="flex items-center space-x-2">
           {/* Sync Status */}
           {syncStatus.lastSynced && (
             <span className="text-sm text-muted-foreground">
