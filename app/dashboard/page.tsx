@@ -20,7 +20,9 @@ import {
   ArrowRight,
   Zap,
   Calendar,
-  TrendingUp
+  TrendingUp,
+  Bot,
+  Sparkles
 } from 'lucide-react';
 
 interface WorkflowSummary {
@@ -165,6 +167,34 @@ export default function DashboardPage() {
           <p className="text-gray-600 mt-2">
             Here's an overview of your automation workflows
           </p>
+        </div>
+
+        {/* AI Workflow Generator Banner */}
+        <div className="mb-8 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg shadow-lg overflow-hidden">
+          <div className="px-8 py-6 flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="bg-white/20 p-3 rounded-lg">
+                <Bot className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  AI Workflow Generator
+                  <Sparkles className="h-5 w-5 text-yellow-300" />
+                </h2>
+                <p className="text-white/90 mt-1">
+                  Create workflows instantly using natural language, images, or documents
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/ai-workflow"
+              className="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-white/90 transition-colors flex items-center gap-2"
+            >
+              <Sparkles className="h-5 w-5" />
+              Try AI Generator
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
 
         {/* Stats Grid */}
