@@ -4,7 +4,6 @@ import { authOptions } from '@/lib/auth';
 import fs from 'fs/promises';
 import path from 'path';
 import mammoth from 'mammoth';
-import pdf from 'pdf-parse';
 import * as XLSX from 'xlsx';
 
 // Allowed base paths
@@ -27,12 +26,50 @@ async function readTextFile(filePath: string): Promise<string> {
 
 async function readPDFFile(filePath: string): Promise<string> {
   try {
-    const dataBuffer = await fs.readFile(filePath);
-    const data = await pdf(dataBuffer);
-    return data.text;
+    // Try to read PDF as text first (for text-based PDFs)
+    const buffer = await fs.readFile(filePath);
+    
+    // Simple PDF text extraction without external dependencies
+    // This is a basic implementation that works for simple text PDFs
+    const text = buffer.toString('utf-8');
+    
+    // Check if it's actually a PDF
+    if (!text.startsWith('%PDF')) {
+      return 'Invalid PDF file format';
+    }
+    
+    // Extract readable text between stream objects
+    const textMatches = text.match(/stream[\s\S]*?endstream/g) || [];
+    let extractedText = '';
+    
+    for (const match of textMatches) {
+      // Remove binary data and extract readable text
+      const cleaned = match
+        .replace(/stream\s*/, '')
+        .replace(/\s*endstream/, '')
+        .replace(/[^\x20-\x7E\n\r\t]/g, ' ')
+        .trim();
+      
+      if (cleaned.length > 10) {
+        extractedText += cleaned + '\n';
+      }
+    }
+    
+    // If no text extracted, try looking for text objects
+    if (!extractedText) {
+      const textObjects = text.match(/\(([^)]+)\)/g) || [];
+      extractedText = textObjects
+        .map(t => t.slice(1, -1))
+        .join(' ')
+        .replace(/\\([0-9]{3})/g, (match, oct) => 
+          String.fromCharCode(parseInt(oct, 8))
+        );
+    }
+    
+    return extractedText || 'PDF contains no extractable text. The file may contain only images or be encrypted.';
   } catch (error) {
     console.error('PDF reading error:', error);
-    return 'Unable to extract text from PDF';
+    return 'Unable to extract text from PDF. The file may be corrupted or password-protected.';
   }
 }
 
