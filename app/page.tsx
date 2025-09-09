@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { DemoMode } from '@/components/demo/DemoMode';
 import { 
   Workflow, 
   Zap, 
@@ -31,6 +32,7 @@ export default function LandingPage() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [showDemo, setShowDemo] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -204,6 +206,7 @@ export default function LandingPage() {
               <Rocket className="ml-2 h-5 w-5" />
             </button>
             <button 
+              onClick={() => setShowDemo(true)}
               className="border border-gray-300 hover:border-gray-400 text-gray-700 px-8 py-3 rounded-lg font-medium transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
             >
               <Play className="mr-2 h-5 w-5" />
@@ -416,6 +419,17 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Demo Modal */}
+      {showDemo && (
+        <DemoMode
+          onClose={() => setShowDemo(false)}
+          onSelectScenario={(scenario) => {
+            setShowDemo(false);
+            router.push('/ai-workflow');
+          }}
+        />
+      )}
     </div>
   );
 }

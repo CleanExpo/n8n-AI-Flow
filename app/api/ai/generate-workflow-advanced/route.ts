@@ -295,7 +295,30 @@ function generateWorkflowFromPatterns(
   // Determine trigger type
   let triggerId: string | null = null;
   
-  if (combinedText.includes('webhook') || combinedText.includes('api')) {
+  // Check for Gmail specifically
+  if (combinedText.includes('gmail') || (combinedText.includes('email') && combinedText.includes('urgent'))) {
+    triggerId = `node_${nodeIdCounter++}`;
+    nodes.push({
+      id: triggerId,
+      type: 'n8n-nodes-base.gmailTrigger',
+      name: 'Gmail Trigger',
+      position: [250, yPosition],
+      parameters: {
+        pollTimes: {
+          item: [{
+            mode: 'everyMinute'
+          }]
+        },
+        options: {},
+        filters: {
+          labelIds: [],
+          searchTerms: 'subject:urgent'
+        }
+      }
+    });
+    tags.push('gmail', 'email', 'trigger');
+    yPosition += 150;
+  } else if (combinedText.includes('webhook') || combinedText.includes('api')) {
     triggerId = `node_${nodeIdCounter++}`;
     nodes.push({
       id: triggerId,
@@ -456,25 +479,30 @@ return processedItems;`
   }
   
   // Add action nodes
-  actions.forEach(action => {
+  actions.forEach((action, index) => {
     const actionId = `node_${nodeIdCounter++}`;
     const template = nodeTemplates[action.type as keyof typeof nodeTemplates];
+    
+    // Position actions horizontally to the right of the last node
+    const xPosition = 500 + (index * 250);
+    const actionYPosition = nodes[nodes.length - 1]?.position[1] || 100;
     
     nodes.push({
       id: actionId,
       type: template.type,
       name: action.name,
-      position: [250, yPosition],
+      position: [xPosition, actionYPosition],
       parameters: template.parameters
     });
     
     connections.push({
       source: lastNodeId,
-      target: actionId
+      target: actionId,
+      sourceHandle: 'output',
+      targetHandle: 'input'
     });
     
     lastNodeId = actionId;
-    yPosition += 150;
   });
   
   // If no actions were added, add a default response node
