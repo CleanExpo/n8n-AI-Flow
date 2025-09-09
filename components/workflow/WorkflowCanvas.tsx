@@ -18,12 +18,14 @@ import { useWorkflowStore } from '@/lib/stores/workflow-store';
 import { nodeTypes } from './nodes/custom-nodes';
 import { NodeConfigPanel } from './NodeConfigPanel';
 import { WorkflowToolbar } from './WorkflowToolbar';
+import { WorkflowExporter } from './WorkflowExporter';
 import toast from 'react-hot-toast';
 
 const WorkflowCanvasInner: React.FC = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const { screenToFlowPosition } = useReactFlow();
   const [showConfigPanel, setShowConfigPanel] = useState(false);
+  const [showExportPanel, setShowExportPanel] = useState(false);
 
   const {
     nodes,
@@ -180,6 +182,13 @@ const WorkflowCanvasInner: React.FC = () => {
             >
               {isLoading ? 'Executing...' : 'Execute Workflow'}
             </button>
+            <button
+              onClick={() => setShowExportPanel(true)}
+              disabled={nodes.length === 0}
+              className="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium shadow-sm"
+            >
+              Export to n8n
+            </button>
           </div>
         </Panel>
 
@@ -218,6 +227,28 @@ const WorkflowCanvasInner: React.FC = () => {
           node={selectedNode}
           onClose={() => setShowConfigPanel(false)}
         />
+      )}
+
+      {/* Export Panel */}
+      {showExportPanel && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white dark:bg-gray-900 border-b p-4 flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Export Workflow to n8n</h2>
+              <button
+                onClick={() => setShowExportPanel(false)}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6">
+              <WorkflowExporter />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
