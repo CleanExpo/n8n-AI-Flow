@@ -22,8 +22,10 @@ import {
   Calendar,
   TrendingUp,
   Bot,
-  Sparkles
+  Sparkles,
+  Rocket
 } from 'lucide-react';
+import { DemoMode } from '@/components/demo/DemoMode';
 
 interface WorkflowSummary {
   id: string;
@@ -44,6 +46,7 @@ export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [workflows, setWorkflows] = useState<WorkflowSummary[]>([]);
+  const [showDemo, setShowDemo] = useState(false);
   const [stats, setStats] = useState<Stats>({
     totalWorkflows: 0,
     activeWorkflows: 0,
@@ -186,14 +189,23 @@ export default function DashboardPage() {
                 </p>
               </div>
             </div>
-            <Link
-              href="/ai-workflow"
-              className="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-white/90 transition-colors flex items-center gap-2"
-            >
-              <Sparkles className="h-5 w-5" />
-              Try AI Generator
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowDemo(true)}
+                className="bg-white/20 text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/30 transition-colors flex items-center gap-2 border border-white/30"
+              >
+                <Rocket className="h-5 w-5" />
+                Start Demo
+              </button>
+              <Link
+                href="/ai-workflow"
+                className="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-white/90 transition-colors flex items-center gap-2"
+              >
+                <Sparkles className="h-5 w-5" />
+                Try AI Generator
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -355,6 +367,19 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
+
+      {/* Demo Mode Modal */}
+      {showDemo && (
+        <DemoMode 
+          isOpen={showDemo}
+          onClose={() => setShowDemo(false)}
+          onSelectScenario={(scenario) => {
+            console.log('Selected scenario:', scenario);
+            setShowDemo(false);
+            router.push('/ai-workflow');
+          }}
+        />
+      )}
     </div>
   );
 }
