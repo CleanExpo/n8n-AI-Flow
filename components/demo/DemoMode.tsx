@@ -233,34 +233,12 @@ export function DemoMode({ onSelectScenario, onClose, isOpen = true }: DemoModeP
   );
 
   const handleSelectScenario = (scenario: DemoScenario) => {
-    // Simulate loading the scenario
+    // Store scenario data in sessionStorage for the AI Workflow page to pick up
+    sessionStorage.setItem('demoScenario', JSON.stringify(scenario));
+    
+    // Call the callback
     if (onSelectScenario) {
       onSelectScenario(scenario);
-    }
-    
-    // Auto-fill the chat input with the prompt
-    const chatInput = document.querySelector('textarea[placeholder*="Describe"]') as HTMLTextAreaElement;
-    if (chatInput) {
-      chatInput.value = scenario.prompt;
-      chatInput.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-
-    // If there's a sample file, simulate file upload
-    if (scenario.sampleFile) {
-      const file = new File(
-        [scenario.sampleFile.content],
-        scenario.sampleFile.name,
-        { type: scenario.sampleFile.type }
-      );
-      
-      // Trigger file upload event
-      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-      if (fileInput) {
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-        fileInput.files = dataTransfer.files;
-        fileInput.dispatchEvent(new Event('change', { bubbles: true }));
-      }
     }
   };
 

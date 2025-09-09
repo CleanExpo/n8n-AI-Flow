@@ -90,6 +90,42 @@ export function AIWorkflowChat({
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Check for demo scenario data on mount
+  useEffect(() => {
+    const storedScenario = sessionStorage.getItem('demoScenario');
+    if (storedScenario) {
+      try {
+        const scenario = JSON.parse(storedScenario);
+        
+        // Set the input prompt
+        setInput(scenario.prompt);
+        
+        // Add demo message
+        setMessages(prev => [...prev, {
+          id: 'demo-' + Date.now(),
+          role: 'system' as const,
+          content: `🎯 Demo Scenario Loaded: ${scenario.title}\n\n${scenario.description}`,
+          timestamp: new Date()
+        }]);
+        
+        // If there's a sample file, create it as an attachment
+        if (scenario.sampleFile) {
+          const file = new File(
+            [scenario.sampleFile.content],
+            scenario.sampleFile.name,
+            { type: scenario.sampleFile.type }
+          );
+          setAttachments([file]);
+        }
+        
+        // Clear the storage after using it
+        sessionStorage.removeItem('demoScenario');
+      } catch (error) {
+        console.error('Failed to load demo scenario:', error);
+      }
+    }
+  }, []);
+
   const handleSendMessage = async () => {
     if (!input.trim() && attachments.length === 0 && selectedFiles.length === 0) return;
 
