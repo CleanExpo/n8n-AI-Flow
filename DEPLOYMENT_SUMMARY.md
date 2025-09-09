@@ -1,8 +1,10 @@
 # n8n AI Flow - Deployment Summary
 
 ## 🚀 Live Application
-**URL**: https://n8n-ai-flow-ivwlhhsfo-unite-group.vercel.app
-**Previous URL**: https://n8n-ai-flow-fotqpdrrp-unite-group.vercel.app
+**Current URL**: https://n8n-ai-flow-9y2k2zhki-unite-group.vercel.app
+**Previous URLs**: 
+- https://n8n-ai-flow-ivwlhhsfo-unite-group.vercel.app
+- https://n8n-ai-flow-fotqpdrrp-unite-group.vercel.app
 
 ## 📊 Project Overview
 A revolutionary AI-powered n8n workflow generator that creates automation workflows from natural language, documents, images, and voice commands.
@@ -119,7 +121,7 @@ my-app/
 ### Required Environment Variables
 ```bash
 # Authentication
-NEXTAUTH_URL=https://n8n-ai-flow-ivwlhhsfo-unite-group.vercel.app
+NEXTAUTH_URL=https://n8n-ai-flow-9y2k2zhki-unite-group.vercel.app
 NEXTAUTH_SECRET=your-secret
 
 # Database
@@ -270,7 +272,7 @@ SHARED_DOCUMENTS_PATH=/path/to/shared
 
 ## Quick Start for New Users
 
-1. **Visit**: https://n8n-ai-flow-ivwlhhsfo-unite-group.vercel.app
+1. **Visit**: https://n8n-ai-flow-9y2k2zhki-unite-group.vercel.app
 2. **Sign In**: Use your credentials
 3. **Click**: "Start Demo" button
 4. **Choose**: A scenario that matches your needs
