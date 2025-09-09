@@ -143,9 +143,9 @@ async function generateWorkflowFromPrompt(
     for (let i = 0; i < workflow.nodes.length - 1; i++) {
       workflow.connections.push({
         source: workflow.nodes[i].id,
-        sourceHandle: 'main',
+        sourceHandle: 'output-0',
         target: workflow.nodes[i + 1].id,
-        targetHandle: 'main'
+        targetHandle: 'input-0'
       });
     }
   }
@@ -178,9 +178,9 @@ async function generateWorkflowFromPrompt(
     
     workflow.connections = [{
       source: 'start',
-      sourceHandle: 'main',
+      sourceHandle: 'output-0',
       target: 'set_data',
-      targetHandle: 'main'
+      targetHandle: 'input-0'
     }];
   }
 

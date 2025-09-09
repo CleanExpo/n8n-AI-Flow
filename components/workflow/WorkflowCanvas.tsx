@@ -155,18 +155,18 @@ const WorkflowCanvasInner: React.FC = () => {
 
         {/* Bottom Panel with Actions */}
         <Panel position="bottom-center">
-          <div className="flex gap-2 bg-white rounded-lg shadow-lg p-2">
+          <div className="flex gap-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-3">
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium shadow-sm"
             >
               {isSaving ? 'Saving...' : 'Save Workflow'}
             </button>
             <button
               onClick={handleExecute}
               disabled={isLoading || nodes.length === 0}
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium shadow-sm"
             >
               {isLoading ? 'Executing...' : 'Execute Workflow'}
             </button>

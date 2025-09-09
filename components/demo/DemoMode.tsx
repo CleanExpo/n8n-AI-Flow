@@ -276,9 +276,9 @@ export function DemoMode({ onSelectScenario, onClose, isOpen = true }: DemoModeP
   return (
     <>
       {/* Main Demo Panel */}
-      <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
+      <div className="fixed inset-0 z-50 bg-black/60">
         <div className="fixed inset-4 md:inset-8 flex items-center justify-center">
-          <Card className="w-full max-w-6xl max-h-full overflow-hidden flex flex-col">
+          <Card className="w-full max-w-6xl max-h-full overflow-hidden flex flex-col bg-white dark:bg-gray-900 shadow-2xl">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b">
               <div className="flex items-center gap-3">

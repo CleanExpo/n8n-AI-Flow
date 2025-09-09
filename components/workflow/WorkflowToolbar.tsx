@@ -100,8 +100,8 @@ export const WorkflowToolbar: React.FC = () => {
   }, {} as Record<string, NodeTemplate[]>);
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-4 max-w-4xl">
-      <h3 className="text-sm font-semibold text-gray-700 mb-3">Drag nodes to canvas</h3>
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-4 max-w-4xl">
+      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Drag nodes to canvas</h3>
       
       <div className="space-y-4">
         {Object.entries(groupedNodes).map(([category, nodes]) => (

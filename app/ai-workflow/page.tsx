@@ -71,8 +71,8 @@ export default function AIWorkflowPage() {
           id: `edge-${index}`,
           source: connection.source,
           target: connection.target,
-          sourceHandle: connection.sourceHandle || 'output',
-          targetHandle: connection.targetHandle || 'input',
+          sourceHandle: connection.sourceHandle || 'output-0',
+          targetHandle: connection.targetHandle || 'input-0',
           type: 'smoothstep',
           animated: true
         });
