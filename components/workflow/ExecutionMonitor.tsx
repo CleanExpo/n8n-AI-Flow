@@ -20,7 +20,7 @@ import {
   FileJson,
   Activity
 } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+// Removed date-fns dependency - using native date formatting
 import { cn } from '@/lib/utils';
 
 interface ExecutionLog {
@@ -264,9 +264,7 @@ export function ExecutionMonitor({ workflowId, onExecute }: ExecutionMonitorProp
                       <div className="mt-2 text-xs text-muted-foreground">
                         {execution.trigger_type} • {' '}
                         {execution.started_at
-                          ? formatDistanceToNow(new Date(execution.started_at), {
-                              addSuffix: true,
-                            })
+                          ? new Date(execution.started_at).toLocaleString()
                           : 'Not started'}
                       </div>
                       {execution.status === 'running' && (

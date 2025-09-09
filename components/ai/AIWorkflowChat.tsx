@@ -17,12 +17,21 @@ import {
   AlertCircle,
   Eye,
   Play,
-  Save
+  Save,
+  Folder,
+  Files,
+  Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { EnhancedFileBrowser, FileItem } from './EnhancedFileBrowser';
+import { FilePreview } from './FilePreview';
+import { ContentExtractor, ExtractedContent } from '@/lib/content-extraction';
+import { SmartDocumentParser, GeneratedWorkflow } from '@/lib/smart-document-parser';
 
 interface Message {
   id: string;
@@ -37,6 +46,8 @@ interface Message {
   workflowPreview?: any;
   timestamp: Date;
   status?: 'sending' | 'processing' | 'complete' | 'error';
+  extractedContent?: ExtractedContent[];
+  generatedWorkflow?: GeneratedWorkflow;
 }
 
 interface AIWorkflowChatProps {
@@ -54,7 +65,7 @@ export function AIWorkflowChat({
     {
       id: '1',
       role: 'assistant',
-      content: "Hello! I'm your AI Workflow Assistant. I can help you create n8n workflows from your ideas, images, documents, or URLs. Just describe what you want to automate, and I'll build it for you!",
+      content: "Hello! I'm your enhanced AI Workflow Assistant. I can help you create powerful n8n workflows from your ideas, documents, entire folders, or projects. Browse files, upload documents, or describe what you want to automate - I'll analyze everything and build the perfect workflow for you!",
       timestamp: new Date()
     }
   ]);
@@ -63,23 +74,46 @@ export function AIWorkflowChat({
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [attachments, setAttachments] = useState<File[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<FileItem[]>([]);
+  const [extractedContents, setExtractedContents] = useState<ExtractedContent[]>([]);
+  const [activeTab, setActiveTab] = useState<'chat' | 'files' | 'preview'>('chat');
+  const [previewFile, setPreviewFile] = useState<FileItem | null>(null);
+  const [showFileBrowser, setShowFileBrowser] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const contentExtractor = new ContentExtractor();
+  const documentParser = new SmartDocumentParser();
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const handleSendMessage = async () => {
-    if (!input.trim() && attachments.length === 0) return;
+    if (!input.trim() && attachments.length === 0 && selectedFiles.length === 0) return;
+
+    // Process all file sources
+    let allExtractedContent = [...extractedContents];
+    
+    // Process regular attachments
+    if (attachments.length > 0) {
+      for (const file of attachments) {
+        try {
+          const extracted = await contentExtractor.extractFromFile(file);
+          allExtractedContent.push(extracted);
+        } catch (error) {
+          console.error('Failed to extract content from', file.name, error);
+        }
+      }
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
       content: input,
       attachments: await processAttachments(attachments),
+      extractedContent: allExtractedContent,
       timestamp: new Date(),
       status: 'sending'
     };
@@ -87,41 +121,52 @@ export function AIWorkflowChat({
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setAttachments([]);
+    setSelectedFiles([]);
+    setExtractedContents([]);
     setIsProcessing(true);
 
-    // Call AI generation API
     try {
+      // Generate workflow using smart document parser
+      const generatedWorkflow = await documentParser.generateWorkflowFromContent(
+        allExtractedContent,
+        input
+      );
+
+      // Also call the existing API for compatibility
       const response = await fetch('/api/ai/generate-workflow', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: input,
           attachments: userMessage.attachments,
-          context: messages.slice(-5) // Send last 5 messages for context
+          extractedContent: allExtractedContent,
+          context: messages.slice(-5)
         })
       });
 
-      const data = await response.json();
+      const apiData = await response.json();
 
       const aiResponse: Message = {
         id: Date.now().toString(),
         role: 'assistant',
-        content: data.explanation || 'I\'ve generated a workflow based on your requirements.',
-        workflowPreview: data.workflow,
+        content: `I've analyzed ${allExtractedContent.length} document(s) and generated a comprehensive workflow. Here's what I found:\n\n${generatedWorkflow.description}\n\nConfidence: ${Math.round(generatedWorkflow.metadata.confidence * 100)}%\nComplexity: ${generatedWorkflow.metadata.complexity}\nCategory: ${generatedWorkflow.metadata.category}`,
+        workflowPreview: apiData.workflow || generatedWorkflow,
+        generatedWorkflow: generatedWorkflow,
+        extractedContent: allExtractedContent,
         timestamp: new Date(),
         status: 'complete'
       };
 
       setMessages(prev => [...prev, aiResponse]);
       
-      if (data.workflow && onWorkflowGenerated) {
-        onWorkflowGenerated(data.workflow);
+      if (onWorkflowGenerated) {
+        onWorkflowGenerated(apiData.workflow || generatedWorkflow);
       }
     } catch (error) {
       const errorMessage: Message = {
         id: Date.now().toString(),
         role: 'assistant',
-        content: 'I encountered an error while generating your workflow. Please try again.',
+        content: 'I encountered an error while analyzing your documents and generating the workflow. Please try again or check your files.',
         timestamp: new Date(),
         status: 'error'
       };
@@ -233,23 +278,97 @@ export function AIWorkflowChat({
     setAttachments(prev => [...prev, ...files]);
   };
 
+  const handleFilesSelected = async (files: FileItem[]) => {
+    setSelectedFiles(files);
+    
+    // Extract content from selected files
+    const contents: ExtractedContent[] = [];
+    for (const fileItem of files) {
+      try {
+        // Create a mock File object for extraction
+        const mockFile = new File(['mock content'], fileItem.name, {
+          type: getMimeType(fileItem.extension || ''),
+          lastModified: fileItem.lastModified?.getTime() || Date.now()
+        });
+        const extracted = await contentExtractor.extractFromFile(mockFile);
+        contents.push(extracted);
+      } catch (error) {
+        console.error('Failed to extract content from', fileItem.name, error);
+      }
+    }
+    
+    setExtractedContents(contents);
+    setActiveTab('chat'); // Switch back to chat to show the processed files
+  };
+
+  const getMimeType = (extension: string): string => {
+    const mimeTypes: Record<string, string> = {
+      'txt': 'text/plain',
+      'json': 'application/json',
+      'js': 'text/javascript',
+      'ts': 'text/typescript',
+      'csv': 'text/csv',
+      'pdf': 'application/pdf',
+      'jpg': 'image/jpeg',
+      'jpeg': 'image/jpeg',
+      'png': 'image/png',
+      'gif': 'image/gif',
+      'svg': 'image/svg+xml'
+    };
+    return mimeTypes[extension.toLowerCase()] || 'application/octet-stream';
+  };
+
+  const handlePreviewFile = (file: FileItem) => {
+    setPreviewFile(file);
+    setActiveTab('preview');
+  };
+
   return (
     <Card className={cn("flex flex-col h-full", className)}>
       <div className="flex items-center justify-between p-4 border-b">
         <div className="flex items-center space-x-2">
           <Bot className="h-5 w-5 text-primary" />
-          <h3 className="font-semibold">AI Workflow Assistant</h3>
+          <h3 className="font-semibold">Enhanced AI Workflow Assistant</h3>
           <Sparkles className="h-4 w-4 text-yellow-500" />
         </div>
-        {isProcessing && (
-          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span>Generating workflow...</span>
-          </div>
-        )}
+        
+        <div className="flex items-center space-x-2">
+          {isProcessing && (
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Processing files...</span>
+            </div>
+          )}
+          
+          {(selectedFiles.length > 0 || extractedContents.length > 0) && (
+            <Badge variant="secondary">
+              <Files className="h-3 w-3 mr-1" />
+              {selectedFiles.length + extractedContents.length} files
+            </Badge>
+          )}
+        </div>
       </div>
 
-      <ScrollArea className="flex-1 p-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+        <TabsList className="w-full justify-start rounded-none border-b">
+          <TabsTrigger value="chat">
+            <Bot className="h-4 w-4 mr-2" />
+            Chat
+          </TabsTrigger>
+          <TabsTrigger value="files">
+            <Folder className="h-4 w-4 mr-2" />
+            File Browser
+          </TabsTrigger>
+          {previewFile && (
+            <TabsTrigger value="preview">
+              <Eye className="h-4 w-4 mr-2" />
+              Preview
+            </TabsTrigger>
+          )}
+        </TabsList>
+
+        <TabsContent value="chat" className="flex-1 flex flex-col m-0">
+          <ScrollArea className="flex-1 p-4">
         <div className="space-y-4">
           {messages.map((message) => (
             <div
@@ -292,7 +411,65 @@ export function AIWorkflowChat({
                   </div>
                 )}
 
-                {message.workflowPreview && (
+                {message.extractedContent && message.extractedContent.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    <span className="text-xs font-medium">Analyzed Documents:</span>
+                    {message.extractedContent.map((content, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-xs bg-muted/50 p-1 rounded">
+                        <Badge variant="outline" className="text-xs px-1 py-0">
+                          {content.metadata.type}
+                        </Badge>
+                        <span className="opacity-70">
+                          {content.workflows?.length || 0} workflows detected
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {message.generatedWorkflow && (
+                  <div className="mt-3 p-3 bg-gradient-to-br from-primary/5 to-primary/10 rounded border">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-medium flex items-center gap-1">
+                        <Zap className="h-3 w-3" />
+                        Smart Generated Workflow
+                      </span>
+                      <div className="flex gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-6 w-6 p-0"
+                          onClick={() => onPreviewWorkflow?.(message.generatedWorkflow)}
+                        >
+                          <Eye className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-6 w-6 p-0"
+                        >
+                          <Play className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span className="opacity-70">Steps:</span> {message.generatedWorkflow.steps.length}
+                      </div>
+                      <div>
+                        <span className="opacity-70">Confidence:</span> {Math.round(message.generatedWorkflow.metadata.confidence * 100)}%
+                      </div>
+                      <div>
+                        <span className="opacity-70">Category:</span> {message.generatedWorkflow.metadata.category}
+                      </div>
+                      <div>
+                        <span className="opacity-70">Complexity:</span> {message.generatedWorkflow.metadata.complexity}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {message.workflowPreview && !message.generatedWorkflow && (
                   <div className="mt-3 p-2 bg-background/50 rounded border">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs font-medium">Generated Workflow</span>
@@ -336,6 +513,84 @@ export function AIWorkflowChat({
           <div ref={chatEndRef} />
         </div>
       </ScrollArea>
+
+          {/* Enhanced file status display */}
+          {(selectedFiles.length > 0 || extractedContents.length > 0) && (
+            <div className="mb-4 p-3 bg-muted/30 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">Selected Files & Analysis</span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    setSelectedFiles([]);
+                    setExtractedContents([]);
+                  }}
+                >
+                  Clear All
+                </Button>
+              </div>
+              
+              <div className="space-y-2">
+                {selectedFiles.map((file, idx) => (
+                  <div key={idx} className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <Files className="h-3 w-3" />
+                      <span>{file.name}</span>
+                      <Badge variant="outline" className="text-xs">
+                        {file.extension?.toUpperCase()}
+                      </Badge>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-6 w-6 p-0"
+                      onClick={() => handlePreviewFile(file)}
+                    >
+                      <Eye className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+                
+                {extractedContents.map((content, idx) => (
+                  <div key={idx} className="text-xs text-muted-foreground pl-5">
+                    ✓ Extracted {content.metadata.type} content
+                    {content.workflows && content.workflows.length > 0 && (
+                      <span> • {content.workflows.length} workflow patterns detected</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="files" className="flex-1 m-0">
+          <EnhancedFileBrowser
+            onFilesSelected={handleFilesSelected}
+            allowMultiple={true}
+            allowFolders={true}
+            showPreview={true}
+            className="h-full"
+          />
+        </TabsContent>
+
+        {previewFile && (
+          <TabsContent value="preview" className="flex-1 m-0 relative">
+            <FilePreview
+              file={previewFile}
+              onClose={() => {
+                setPreviewFile(null);
+                setActiveTab('chat');
+              }}
+              onExtractContent={(content) => {
+                setExtractedContents(prev => [...prev, content]);
+              }}
+              className="absolute inset-0"
+            />
+          </TabsContent>
+        )}
+      </Tabs>
 
       <div className="p-4 border-t">
         {attachments.length > 0 && (
