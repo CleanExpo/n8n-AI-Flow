@@ -49,16 +49,30 @@ export default function AIWorkflowPage() {
     
     // Add generated nodes to the canvas
     if (workflow.nodes) {
-      workflow.nodes.forEach((node: any) => {
+      workflow.nodes.forEach((node: any, index: number) => {
+        // Ensure valid position with proper validation
+        const validatePosition = (pos: any) => {
+          if (!pos || typeof pos !== 'object') return null;
+          const x = typeof pos.x === 'number' && !isNaN(pos.x) ? pos.x : null;
+          const y = typeof pos.y === 'number' && !isNaN(pos.y) ? pos.y : null;
+          return x !== null && y !== null ? { x, y } : null;
+        };
+
+        const validPosition = validatePosition(node.position) || {
+          x: 250 + (index % 3) * 250, // Grid layout: 250, 500, 750, then wrap
+          y: 300 + Math.floor(index / 3) * 200 // Rows: 300, 500, 700, etc.
+        };
+
         addNode({
           id: node.id,
           type: 'custom',
-          position: node.position || { x: Math.random() * 500, y: Math.random() * 300 },
+          position: validPosition,
           data: {
-            label: node.type.split('.').pop(),
-            type: node.type,
+            label: node.type?.split('.').pop() || 'Unknown Node',
+            type: node.type || 'unknown',
             parameters: node.parameters || {},
-            icon: getNodeIcon(node.type)
+            icon: getNodeIcon(node.type || ''),
+            description: `Configure your ${node.type?.split('.').pop() || 'node'} settings`
           }
         });
       });
@@ -84,8 +98,8 @@ export default function AIWorkflowPage() {
     setShowPreview(true);
     
     toast({
-      title: 'Workflow Generated!',
-      description: `Created ${workflow.nodes?.length || 0} nodes with ${workflow.connections?.length || 0} connections`
+      title: '🎉 Workflow Generated Successfully!',
+      description: `Created ${workflow.nodes?.length || 0} nodes with ${workflow.connections?.length || 0} connections. Ready to preview and deploy!`
     });
   };
 
@@ -119,8 +133,8 @@ export default function AIWorkflowPage() {
       if (response.ok) {
         const data = await response.json();
         toast({
-          title: 'Workflow Saved!',
-          description: 'Your workflow has been saved successfully'
+          title: '✅ Workflow Saved Successfully!',
+          description: 'Your workflow has been saved and is ready to use'
         });
         router.push(`/workflows/${data.id}`);
       }
@@ -168,8 +182,8 @@ export default function AIWorkflowPage() {
 
       if (syncResponse.ok) {
         toast({
-          title: 'Deployed to n8n!',
-          description: 'Your workflow is now active in n8n'
+          title: '🚀 Successfully Deployed to n8n!',
+          description: 'Your workflow is now live and ready to automate your processes'
         });
         router.push(`/workflows/${savedWorkflow.id}`);
       }

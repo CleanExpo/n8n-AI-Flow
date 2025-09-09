@@ -96,8 +96,28 @@ export const useWorkflowStore = create<WorkflowState>((set, get) => ({
 
   // Node operations
   addNode: (node) => {
+    // Validate and sanitize node before adding
+    const validatePosition = (pos: any) => {
+      if (!pos || typeof pos !== 'object') {
+        return { x: 250, y: 300 }; // Default position
+      }
+      const x = typeof pos.x === 'number' && !isNaN(pos.x) && isFinite(pos.x) ? pos.x : 250;
+      const y = typeof pos.y === 'number' && !isNaN(pos.y) && isFinite(pos.y) ? pos.y : 300;
+      return { x, y };
+    };
+
+    const sanitizedNode = {
+      ...node,
+      id: node.id || `node_${Date.now()}`, // Ensure ID exists
+      position: validatePosition(node.position),
+      data: {
+        label: 'New Node',
+        ...node.data, // Allow data to override defaults
+      },
+    };
+
     set((state) => ({
-      nodes: [...state.nodes, node],
+      nodes: [...state.nodes, sanitizedNode],
     }));
   },
 

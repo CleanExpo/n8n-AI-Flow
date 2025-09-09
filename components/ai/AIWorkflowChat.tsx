@@ -73,6 +73,7 @@ export function AIWorkflowChat({
   const [input, setInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [processingStage, setProcessingStage] = useState<string>('');
   const [attachments, setAttachments] = useState<File[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<FileItem[]>([]);
   const [extractedContents, setExtractedContents] = useState<ExtractedContent[]>([]);
@@ -164,22 +165,28 @@ export function AIWorkflowChat({
     setSelectedFiles([]);
     setExtractedContents([]);
     setIsProcessing(true);
+    setProcessingStage('Analyzing your request...');
 
     try {
       console.log('Sending request to /api/ai/generate-workflow');
       
-      // Skip document parser for now to debug API call
+      // Process documents with error handling
+      setProcessingStage('Processing documents and extracting workflow patterns...');
       let generatedWorkflow = null;
       try {
-        generatedWorkflow = await documentParser.generateWorkflowFromContent(
-          allExtractedContent,
-          input
-        );
+        if (allExtractedContent.length > 0) {
+          generatedWorkflow = await documentParser.generateWorkflowFromContent(
+            allExtractedContent,
+            input
+          );
+        }
       } catch (parserError) {
         console.warn('Document parser error (non-fatal):', parserError);
+        // Don't show parser errors to users - they're internal processing details
       }
 
-      // Call the API
+      // Generate workflow with AI
+      setProcessingStage('Generating workflow with AI...');
       const response = await fetch('/api/ai/generate-workflow', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -198,16 +205,51 @@ export function AIWorkflowChat({
         console.error('API Error:', response.status, response.statusText);
         const errorText = await response.text();
         console.error('Error details:', errorText);
-        throw new Error(`API returned ${response.status}: ${errorText}`);
+        
+        // Provide user-friendly error messages
+        let userErrorMessage = 'Failed to generate workflow. ';
+        if (response.status === 429) {
+          userErrorMessage = 'Too many requests. Please try again in a moment.';
+        } else if (response.status >= 500) {
+          userErrorMessage = 'Server is temporarily unavailable. Please try again later.';
+        } else if (response.status === 401) {
+          userErrorMessage = 'Authentication required. Please sign in and try again.';
+        } else {
+          userErrorMessage = 'Unable to process your request. Please try rephrasing or simplifying your prompt.';
+        }
+        
+        throw new Error(userErrorMessage);
       }
       
+      setProcessingStage('Finalizing workflow...');
       const apiData = await response.json();
       console.log('API Data received:', apiData);
+
+      // Create response content based on what was actually generated
+      let responseContent = "I've successfully generated your workflow! ";
+      
+      if (allExtractedContent.length > 0) {
+        responseContent += `I analyzed ${allExtractedContent.length} document(s) and extracted the key automation patterns. `;
+      }
+      
+      if (generatedWorkflow?.description) {
+        responseContent += `\n\n${generatedWorkflow.description}`;
+        if (generatedWorkflow.metadata) {
+          responseContent += `\n\n📊 **Workflow Analysis:**\n`;
+          responseContent += `• Confidence: ${Math.round(generatedWorkflow.metadata.confidence * 100)}%\n`;
+          responseContent += `• Complexity: ${generatedWorkflow.metadata.complexity}\n`;
+          responseContent += `• Category: ${generatedWorkflow.metadata.category}`;
+        }
+      } else if (apiData.explanation) {
+        responseContent += `\n\n${apiData.explanation}`;
+      }
+      
+      responseContent += "\n\nYou can now preview, customize, or deploy this workflow to n8n!";
 
       const aiResponse: Message = {
         id: Date.now().toString(),
         role: 'assistant',
-        content: `I've analyzed ${allExtractedContent.length} document(s) and generated a comprehensive workflow. Here's what I found:\n\n${generatedWorkflow.description}\n\nConfidence: ${Math.round(generatedWorkflow.metadata.confidence * 100)}%\nComplexity: ${generatedWorkflow.metadata.complexity}\nCategory: ${generatedWorkflow.metadata.category}`,
+        content: responseContent,
         workflowPreview: apiData.workflow || generatedWorkflow,
         generatedWorkflow: generatedWorkflow,
         extractedContent: allExtractedContent,
@@ -222,16 +264,33 @@ export function AIWorkflowChat({
       }
     } catch (error) {
       console.error('Error in handleSendMessage:', error);
+      
+      // Provide helpful, user-friendly error message
+      let errorContent = "I apologize, but I encountered an issue while generating your workflow. ";
+      
+      if (error instanceof Error) {
+        errorContent += error.message;
+      } else {
+        errorContent += "This might be a temporary issue.";
+      }
+      
+      errorContent += "\n\n💡 **Try these solutions:**\n";
+      errorContent += "• Check your internet connection\n";
+      errorContent += "• Simplify your request or break it into smaller parts\n";
+      errorContent += "• Try again in a few moments\n";
+      errorContent += "• If the issue persists, please contact support";
+      
       const errorMessage: Message = {
         id: Date.now().toString(),
         role: 'assistant',
-        content: `Error generating workflow: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`,
+        content: errorContent,
         timestamp: new Date(),
         status: 'error'
       };
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsProcessing(false);
+      setProcessingStage('');
     }
   };
 
@@ -395,7 +454,7 @@ export function AIWorkflowChat({
           {isProcessing && (
             <div className="flex items-center space-x-2 text-sm text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Processing files...</span>
+              <span>{processingStage || 'Processing...'}</span>
             </div>
           )}
           

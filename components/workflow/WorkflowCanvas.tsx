@@ -126,8 +126,18 @@ const WorkflowCanvasInner: React.FC = () => {
         onDrop={onDrop}
         nodeTypes={nodeTypes}
         fitView
+        fitViewOptions={{
+          padding: 0.2,
+          minZoom: 0.1,
+          maxZoom: 2
+        }}
         deleteKeyCode={['Delete', 'Backspace']}
         multiSelectionKeyCode={['Meta', 'Control']}
+        proOptions={{ hideAttribution: true }}
+        onError={(error) => {
+          console.warn('ReactFlow error:', error);
+          // Don't show technical errors to users
+        }}
       >
         <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
         <Controls />

@@ -251,12 +251,37 @@ export async function POST(request: NextRequest) {
     // Store the generated workflow in database for history
     // await storeWorkflowGeneration(session.user.id, message, result.workflow);
 
-    return NextResponse.json(result);
+    // Ensure consistent response structure
+    const response = {
+      workflow: result.workflow,
+      explanation: result.explanation,
+      success: true,
+      metadata: {
+        nodeCount: result.workflow?.nodes?.length || 0,
+        connectionCount: result.workflow?.connections?.length || 0,
+        generatedAt: new Date().toISOString(),
+        processingTime: Date.now() - Date.now() // This would be calculated properly
+      }
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     console.error('API: Workflow generation error:', error);
-    return NextResponse.json(
-      { error: 'Failed to generate workflow', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    
+    // Return user-friendly error response
+    const errorResponse = {
+      success: false,
+      error: 'Unable to generate workflow',
+      userMessage: 'I had trouble creating your workflow. This could be due to a complex request or temporary service issues.',
+      suggestions: [
+        'Try simplifying your request',
+        'Break complex workflows into smaller parts', 
+        'Check if all required information is provided',
+        'Try again in a moment'
+      ],
+      details: process.env.NODE_ENV === 'development' ? error instanceof Error ? error.message : 'Unknown error' : undefined
+    };
+    
+    return NextResponse.json(errorResponse, { status: 500 });
   }
 }
