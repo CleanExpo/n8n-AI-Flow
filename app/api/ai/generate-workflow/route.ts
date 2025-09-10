@@ -13,8 +13,8 @@ async function generateWorkflowFromPrompt(
   
   const workflow = {
     name: `AI Generated - ${message.slice(0, 30)}...`,
-    nodes: [],
-    connections: [],
+    nodes: [] as any[],
+    connections: [] as any[],
     settings: {}
   };
 
