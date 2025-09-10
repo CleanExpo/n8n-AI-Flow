@@ -1,4 +1,0 @@
-{
-  "buildCommand": "npm run build && mkdir -p my-app && cp -r .next my-app/.next",
-  "framework": "nextjs"
-}
