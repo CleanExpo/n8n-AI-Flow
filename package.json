@@ -6,8 +6,7 @@
   "scripts": {
     "build": "cd my-app && npm run build",
     "dev": "cd my-app && npm run dev",
-    "start": "cd my-app && npm run start",
-    "install": "cd my-app && npm install"
+    "start": "cd my-app && npm run start"
   },
   "workspaces": ["my-app"]
 }
