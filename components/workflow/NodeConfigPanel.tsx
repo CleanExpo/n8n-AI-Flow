@@ -13,7 +13,7 @@ interface NodeConfigPanelProps {
 export const NodeConfigPanel: React.FC<NodeConfigPanelProps> = ({ node, onClose }) => {
   const updateNode = useWorkflowStore((state) => state.updateNode);
   const [config, setConfig] = useState<Record<string, any>>(node.data?.config || {});
-  const [nodeName, setNodeName] = useState(node.data?.label || '');
+  const [nodeName, setNodeName] = useState<string>(node.data?.label || '');
 
   // Node-specific configuration fields
   const getConfigFields = () => {
@@ -129,7 +129,7 @@ export const NodeConfigPanel: React.FC<NodeConfigPanelProps> = ({ node, onClose 
           </label>
           <input
             type="text"
-            value={nodeName}
+            value={nodeName || ''}
             onChange={(e) => setNodeName(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
