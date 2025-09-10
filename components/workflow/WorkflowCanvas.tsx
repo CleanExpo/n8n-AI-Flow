@@ -104,11 +104,9 @@ const WorkflowCanvasInner: React.FC = () => {
   // Handle execute
   const handleExecute = async () => {
     try {
-      const executionId = await executeWorkflow();
-      if (executionId) {
-        toast.success('Workflow execution started');
-        // TODO: Open execution monitor
-      }
+      await executeWorkflow();
+      toast.success('Workflow execution started');
+      // TODO: Open execution monitor
     } catch (error) {
       toast.error('Failed to execute workflow');
     }
