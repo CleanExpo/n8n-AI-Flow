@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { DemoMode } from '@/components/demo/DemoMode';
+import { DemoPlayer } from '@/components/demo/DemoPlayer';
 import { 
   Workflow, 
   Zap, 
@@ -33,6 +34,7 @@ export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showDemo, setShowDemo] = useState(false);
+  const [showDemoPlayer, setShowDemoPlayer] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -206,10 +208,10 @@ export default function LandingPage() {
               <Rocket className="ml-2 h-5 w-5" />
             </button>
             <button 
-              onClick={() => setShowDemo(true)}
-              className="border border-gray-300 hover:border-gray-400 text-gray-700 px-8 py-3 rounded-lg font-medium transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+              onClick={() => setShowDemoPlayer(true)}
+              className="border border-gray-300 hover:border-gray-400 text-gray-700 px-8 py-3 rounded-lg font-medium transition-colors flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 group"
             >
-              <Play className="mr-2 h-5 w-5" />
+              <Play className="mr-2 h-5 w-5 group-hover:text-blue-600 transition-colors" />
               Watch Demo
             </button>
           </div>
@@ -430,6 +432,12 @@ export default function LandingPage() {
           }}
         />
       )}
+
+      {/* Demo Player */}
+      <DemoPlayer 
+        isOpen={showDemoPlayer}
+        onClose={() => setShowDemoPlayer(false)}
+      />
     </div>
   );
 }

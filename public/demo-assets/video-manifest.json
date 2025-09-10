@@ -1,0 +1,80 @@
+{
+  "videos": {
+    "main": {
+      "mp4": "/demo-assets/demo-video.mp4",
+      "webm": "/demo-assets/demo-video.webm",
+      "poster": "/demo-assets/demo-poster.jpg",
+      "fallback": "/demo-assets/demo-fallback.gif"
+    }
+  },
+  "offline": {
+    "enabled": true,
+    "cacheStrategy": "cache-first",
+    "maxAge": 86400
+  },
+  "chapters": [
+    {
+      "id": "intro",
+      "title": "Welcome to n8n AI Flow",
+      "startTime": 0,
+      "endTime": 5,
+      "thumbnail": "/demo-assets/chapters/intro.jpg"
+    },
+    {
+      "id": "ai-chat",
+      "title": "AI Workflow Generation",
+      "startTime": 5,
+      "endTime": 15,
+      "thumbnail": "/demo-assets/chapters/ai-chat.jpg"
+    },
+    {
+      "id": "canvas",
+      "title": "Visual Workflow Builder",
+      "startTime": 15,
+      "endTime": 23,
+      "thumbnail": "/demo-assets/chapters/canvas.jpg"
+    },
+    {
+      "id": "youtube",
+      "title": "YouTube Animation Workflows",
+      "startTime": 23,
+      "endTime": 33,
+      "thumbnail": "/demo-assets/chapters/youtube.jpg"
+    },
+    {
+      "id": "configure",
+      "title": "Node Configuration",
+      "startTime": 33,
+      "endTime": 41,
+      "thumbnail": "/demo-assets/chapters/configure.jpg"
+    },
+    {
+      "id": "export",
+      "title": "Export to n8n",
+      "startTime": 41,
+      "endTime": 54,
+      "thumbnail": "/demo-assets/chapters/export.jpg"
+    },
+    {
+      "id": "import",
+      "title": "Import in n8n",
+      "startTime": 54,
+      "endTime": 69,
+      "thumbnail": "/demo-assets/chapters/import.jpg"
+    },
+    {
+      "id": "execute",
+      "title": "Execute & Monitor",
+      "startTime": 69,
+      "endTime": 77,
+      "thumbnail": "/demo-assets/chapters/execute.jpg"
+    },
+    {
+      "id": "complete",
+      "title": "Ready to Automate",
+      "startTime": 77,
+      "endTime": 82,
+      "thumbnail": "/demo-assets/chapters/complete.jpg"
+    }
+  ]
+}

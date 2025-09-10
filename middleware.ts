@@ -1,9 +1,11 @@
 import { withAuth } from 'next-auth/middleware';
 import { NextResponse } from 'next/server';
+import { applySecurityHeaders } from '@/lib/security/headers';
 
 export default withAuth(
   function middleware(req) {
-    return NextResponse.next();
+    const response = NextResponse.next();
+    return applySecurityHeaders(response);
   },
   {
     callbacks: {
@@ -21,6 +23,8 @@ export default withAuth(
 
 export const config = {
   matcher: [
+    // Apply security headers to all routes
+    '/((?!_next/static|_next/image|favicon.ico).*)',
     // Only protect authenticated routes, allow public access to homepage and auth
     '/dashboard/:path*',
     '/workflows/:path*',

@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+# Optimize crawling
+Crawl-delay: 1
+
+# Sitemaps
+Sitemap: https://n8n-ai-flow.vercel.app/sitemap.xml
+
+# Block sensitive areas
+Disallow: /api/
+Disallow: /auth/
+Disallow: /_next/
+Disallow: /dashboard/
+Disallow: /workflows/*/edit
+Disallow: /admin/
+
+# Allow public pages
+Allow: /
+Allow: /ai-workflow
+Allow: /youtube-animation
+Allow: /workflows/templates
