@@ -85,7 +85,7 @@ async function performOCR(imageBuffer: Buffer, mimeType: string) {
       })),
       workflowPatterns,
       metadata: {
-        languages: data.symbols ? detectLanguages(data.text) : ['en'],
+        languages: pageData.symbols ? detectLanguages(data.text) : ['en'],
         hasNumbers: /\d/.test(data.text),
         hasEmail: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/.test(data.text),
         hasUrls: /https?:\/\/[^\s]+/.test(data.text),
