@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AIWorkflowChat } from '@/components/ai/AIWorkflowChat';
 import { WorkflowCanvas } from '@/components/workflow/WorkflowCanvas';
+import { EnhancedWorkflowCanvas } from '@/components/workflow/EnhancedWorkflowCanvas';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -300,8 +301,20 @@ export default function AIWorkflowPage() {
           <TabsContent value="canvas" className="h-full p-0">
             {showPreview && generatedWorkflow ? (
               <div className="h-full relative">
-                <WorkflowCanvas />
-                <div className="absolute top-4 left-4 bg-background/95 backdrop-blur p-3 rounded-lg border shadow-lg">
+                <EnhancedWorkflowCanvas 
+                  initialNodes={nodes}
+                  initialEdges={edges}
+                  onNodesChange={(newNodes) => {
+                    // Update the workflow store if needed
+                  }}
+                  onEdgesChange={(newEdges) => {
+                    // Update the workflow store if needed
+                  }}
+                  onExecute={handleDeployToN8n}
+                  isExecuting={false}
+                  executionData={generatedWorkflow}
+                />
+                <div className="absolute top-20 left-4 bg-background/95 backdrop-blur p-3 rounded-lg border shadow-lg z-30">
                   <div className="flex items-center space-x-2 mb-2">
                     <Sparkles className="h-4 w-4 text-yellow-500" />
                     <span className="text-sm font-medium">AI Generated Workflow</span>
