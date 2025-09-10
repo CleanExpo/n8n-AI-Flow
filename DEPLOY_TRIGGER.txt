@@ -1,1 +1,6 @@
-Trigger deployment Wed, Sep 10, 2025  6:06:37 PM
+Trigger deployment to apply Project Settings configuration - Wed, Sep 10, 2025  6:25:15 PM
+
+Fixed configuration mismatch:
+- Production Overrides used .next as Output Directory 
+- Project Settings use Next.js default (automatic detection)
+- This deployment should resolve the "No Next.js version detected" error
