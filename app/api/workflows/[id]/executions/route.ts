@@ -15,16 +15,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const supabase = await createRouteHandlerClient();
     const executionService = new ExecutionService(supabase);
 
-    const { data, error } = await executionService.getWorkflowExecutions(id, 20);
-
-    if (error) {
+    try {
+      const data = await executionService.getExecutions({ workflowId: id }, 1, 20);
+      return NextResponse.json({ data });
+    } catch (execError: any) {
+      console.error('Execution fetch error:', execError);
       return NextResponse.json(
-        { error: error.message },
+        { error: execError.message || 'Failed to fetch workflow executions' },
         { status: 400 }
       );
     }
-
-    return NextResponse.json({ data });
   } catch (error) {
     console.error('Error fetching workflow executions:', error);
     return NextResponse.json(
