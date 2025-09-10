@@ -2,8 +2,6 @@
 
 import { useCallback, useEffect, useState, useRef } from 'react';
 import ReactFlow, {
-  Node,
-  Edge,
   Controls,
   Background,
   MiniMap,
@@ -20,6 +18,7 @@ import ReactFlow, {
   NodeTypes,
   EdgeTypes,
 } from 'reactflow';
+import type { Node, Edge } from '@xyflow/react';
 import 'reactflow/dist/style.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CustomNode } from './nodes/custom-nodes';
