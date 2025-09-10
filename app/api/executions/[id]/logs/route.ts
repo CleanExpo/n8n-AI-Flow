@@ -25,7 +25,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const supabase = createAdminClient();
     const executionService = new ExecutionService(supabase);
 
-    const { data, error } = await executionService.getExecutionLogs(id);
+    const { data, error } = await executionService.getExecutionWithLogs(id);
 
     if (error) {
       return NextResponse.json(
