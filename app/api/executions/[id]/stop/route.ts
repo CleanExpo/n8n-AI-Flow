@@ -36,7 +36,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const n8nService = new N8nService(n8nCredentials);
 
     // Get execution details
-    const { data: execution, error } = await executionService.getExecution(id);
+    const { data: execution, error } = await executionService.getExecutionWithLogs(id);
 
     if (error || !execution) {
       return NextResponse.json(
