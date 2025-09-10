@@ -405,8 +405,7 @@ export function AIWorkflowChat({
       try {
         // Create a mock File object for extraction
         const mockFile = new File(['mock content'], fileItem.name, {
-          type: getMimeType(fileItem.extension || ''),
-          lastModified: fileItem.lastModified?.getTime() || Date.now()
+          type: getMimeType(fileItem.extension || '')
         });
         const extracted = await contentExtractor.extractFromFile(mockFile);
         contents.push(extracted);
