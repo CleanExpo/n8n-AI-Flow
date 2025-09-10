@@ -119,9 +119,13 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     const { id } = await params;
     const supabase = createAdminClient();
-    const executionService = new ExecutionService(supabase);
 
-    const { data, error } = await executionService.deleteExecution(id);
+    // Delete the execution directly using Supabase
+    const { error } = await supabase
+      .from('executions')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', session.user.id);
 
     if (error) {
       return NextResponse.json(
