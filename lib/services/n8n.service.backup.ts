@@ -306,10 +306,10 @@ export class N8nService {
     // Convert nodes
     const n8nNodes: N8nNode[] = nodes.map((node) => ({
       id: node.id,
-      name: node.data.label || node.type || 'Node',
+      name: (node.data as any).label || node.type || 'Node',
       type: this.mapNodeTypeToN8n(node.type || 'unknown'),
       position: [node.position.x, node.position.y],
-      parameters: this.mapNodeConfigToN8n(node.type || 'unknown', node.data.config || {}),
+      parameters: this.mapNodeConfigToN8n(node.type || 'unknown', (node.data as any).config || {}),
       typeVersion: 1,
     }));
 

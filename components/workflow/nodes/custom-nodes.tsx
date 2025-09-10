@@ -5,7 +5,7 @@ import { NodeProps } from '@xyflow/react';
 import { BaseNode, BaseNodeData } from './BaseNode';
 
 // Webhook Node
-export const WebhookNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
+export const WebhookNode: React.FC<NodeProps> = (props) => {
   return (
     <BaseNode
       {...props}
@@ -21,7 +21,7 @@ export const WebhookNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
 };
 
 // HTTP Request Node
-export const HttpRequestNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
+export const HttpRequestNode: React.FC<NodeProps> = (props) => {
   return (
     <BaseNode
       {...props}
@@ -37,7 +37,7 @@ export const HttpRequestNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
 };
 
 // Transform Data Node
-export const TransformNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
+export const TransformNode: React.FC<NodeProps> = (props) => {
   return (
     <BaseNode
       {...props}
@@ -53,7 +53,7 @@ export const TransformNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
 };
 
 // AI Agent Node
-export const AIAgentNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
+export const AIAgentNode: React.FC<NodeProps> = (props) => {
   return (
     <BaseNode
       {...props}
@@ -69,7 +69,7 @@ export const AIAgentNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
 };
 
 // Database Node
-export const DatabaseNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
+export const DatabaseNode: React.FC<NodeProps> = (props) => {
   return (
     <BaseNode
       {...props}
@@ -85,7 +85,7 @@ export const DatabaseNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
 };
 
 // Email Node
-export const EmailNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
+export const EmailNode: React.FC<NodeProps> = (props) => {
   return (
     <BaseNode
       {...props}
@@ -101,7 +101,7 @@ export const EmailNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
 };
 
 // Conditional Node
-export const ConditionalNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
+export const ConditionalNode: React.FC<NodeProps> = (props) => {
   return (
     <BaseNode
       {...props}
@@ -117,7 +117,7 @@ export const ConditionalNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
 };
 
 // Aggregate Node
-export const AggregateNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
+export const AggregateNode: React.FC<NodeProps> = (props) => {
   return (
     <BaseNode
       {...props}
@@ -133,7 +133,7 @@ export const AggregateNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
 };
 
 // Form Node
-export const FormNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
+export const FormNode: React.FC<NodeProps> = (props) => {
   return (
     <BaseNode
       {...props}
@@ -149,10 +149,12 @@ export const FormNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
 };
 
 // Generic Custom Node for dynamic types
-export const CustomNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
+export const CustomNode: React.FC<NodeProps> = (props) => {
+  const nodeData = props.data as BaseNodeData & { type?: string };
+  
   // Determine icon based on node type
   const getIcon = () => {
-    const type = props.data.type?.toLowerCase() || '';
+    const type = nodeData.type?.toLowerCase() || '';
     if (type.includes('gmail')) return '📧';
     if (type.includes('slack')) return '💬';
     if (type.includes('webhook')) return '🌐';
@@ -161,11 +163,11 @@ export const CustomNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
     if (type.includes('email')) return '✉️';
     if (type.includes('transform')) return '🔄';
     if (type.includes('ai')) return '🤖';
-    return props.data.icon || '⚡';
+    return nodeData.icon || '⚡';
   };
 
   const getColor = () => {
-    const type = props.data.type?.toLowerCase() || '';
+    const type = nodeData.type?.toLowerCase() || '';
     if (type.includes('gmail')) return '#ea4335';
     if (type.includes('slack')) return '#4a154b';
     if (type.includes('webhook')) return '#8b5cf6';
@@ -179,16 +181,16 @@ export const CustomNode: React.FC<NodeProps<BaseNodeData>> = (props) => {
 
   // Determine inputs/outputs based on node type
   const getInputs = () => {
-    const type = props.data.type?.toLowerCase() || '';
+    const type = nodeData.type?.toLowerCase() || '';
     // Triggers have no inputs
     if (type.includes('trigger') || type.includes('gmail') || type.includes('webhook')) {
       return 0;
     }
-    return props.data.inputs !== undefined ? props.data.inputs : 1;
+    return nodeData.inputs !== undefined ? nodeData.inputs : 1;
   };
 
   const getOutputs = () => {
-    return props.data.outputs !== undefined ? props.data.outputs : 1;
+    return nodeData.outputs !== undefined ? nodeData.outputs : 1;
   };
 
   return (
@@ -216,5 +218,5 @@ export const nodeTypes = {
   conditional: ConditionalNode,
   aggregate: AggregateNode,
   form: FormNode,
-  custom: CustomNode, // Add the custom node type
+  custom: CustomNode,
 };

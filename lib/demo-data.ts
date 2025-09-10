@@ -178,15 +178,15 @@ Build an automated workflow system that handles customer onboarding.
             <tr>
                 <td>{{description}}</td>
                 <td>{{quantity}}</td>
-                <td>${{price}}</td>
-                <td>${{total}}</td>
+                <td>\${{price}}</td>
+                <td>\${{total}}</td>
             </tr>
             {{/each}}
         </tbody>
     </table>
     
     <div class="total">
-        Total: ${{total_amount}}
+        Total: \${{total_amount}}
     </div>
 </body>
 </html>`

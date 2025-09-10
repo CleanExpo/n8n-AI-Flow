@@ -318,7 +318,8 @@ export class N8nService {
     
     // Convert nodes
     const n8nNodes: N8nNode[] = nodes.map((node) => {
-      const nodeName = node.data.label || node.type || `Node_${node.id}`;
+      const nodeData = node.data as any;
+      const nodeName = nodeData.label || node.type || `Node_${node.id}`;
       nodeIdToName[node.id] = nodeName;
       
       return {
@@ -326,14 +327,14 @@ export class N8nService {
         name: nodeName,
         type: this.mapNodeTypeToN8n(node.type || 'unknown'),
         position: [node.position.x, node.position.y],
-        parameters: this.mapNodeConfigToN8n(node.type || 'unknown', node.data.config || {}),
+        parameters: this.mapNodeConfigToN8n(node.type || 'unknown', nodeData.config || {}),
         typeVersion: this.getNodeTypeVersion(node.type || 'unknown'),
-        disabled: node.data.disabled || false,
-        notes: node.data.notes || '',
-        continueOnFail: node.data.continueOnFail || false,
-        retryOnFail: node.data.retryOnFail || false,
-        maxTries: node.data.maxTries || 3,
-        waitBetweenTries: node.data.waitBetweenTries || 1000,
+        disabled: nodeData.disabled || false,
+        notes: nodeData.notes || '',
+        continueOnFail: nodeData.continueOnFail || false,
+        retryOnFail: nodeData.retryOnFail || false,
+        maxTries: nodeData.maxTries || 3,
+        waitBetweenTries: nodeData.waitBetweenTries || 1000,
       };
     });
 

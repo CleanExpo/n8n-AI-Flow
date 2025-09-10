@@ -60,7 +60,7 @@ export class ContentExtractor {
         return this.extractFromHTML(file);
       case 'txt':
       case 'md':
-        return this.extractFromText(file);
+        return this.extractFromGeneric(file);
       case 'js':
       case 'ts':
       case 'py':
@@ -166,7 +166,7 @@ export class ContentExtractor {
         structure.sheets.push({
           name: sheetName,
           rows: jsonData.length,
-          columns: Math.max(...jsonData.map((row: any[]) => row.length))
+          columns: Math.max(...jsonData.map((row: any) => Array.isArray(row) ? row.length : 0))
         });
       });
 
@@ -376,7 +376,7 @@ export class ContentExtractor {
       };
 
       if (this.options.extractWorkflows) {
-        content.workflows = this.extractProjectWorkflows(files, zip);
+        content.workflows = await this.extractProjectWorkflows(files, zip);
       }
 
       return content;
@@ -531,7 +531,11 @@ export class ContentExtractor {
   }
 
   private analyzeJSONStructure(data: any): any {
-    const analysis = {
+    const analysis: {
+      type: string;
+      keys: string[];
+      depth: number;
+    } = {
       type: Array.isArray(data) ? 'array' : typeof data,
       keys: [],
       depth: 0

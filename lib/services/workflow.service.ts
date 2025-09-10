@@ -124,11 +124,22 @@ export class WorkflowService {
    */
   async updateWorkflow(workflowId: string, data: UpdateWorkflowDTO): Promise<DatabaseResponse<Workflow>> {
     try {
+      // First, get the current workflow to increment version
+      const { data: currentWorkflow, error: fetchError } = await this.supabase
+        .from('workflows')
+        .select('version')
+        .eq('id', workflowId)
+        .single();
+
+      if (fetchError) {
+        return { data: null, error: fetchError };
+      }
+
       const { data: workflow, error } = await this.supabase
         .from('workflows')
         .update({
           ...data,
-          version: this.supabase.sql`version + 1`
+          version: (currentWorkflow?.version || 0) + 1
         })
         .eq('id', workflowId)
         .select()
