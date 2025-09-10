@@ -23,7 +23,7 @@ type Node = any;
 type Edge = any;
 import 'reactflow/dist/style.css';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CustomNode } from './nodes/custom-nodes';
+import { CustomNode as CustomNodeComponent } from './nodes/custom-nodes';
 import { AnimatedEdge } from './edges/AnimatedEdge';
 import { DataFlowEdge } from './edges/DataFlowEdge';
 import { LearningModePanel } from './LearningModePanel';
@@ -50,8 +50,20 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+// Create a wrapper to handle type compatibility between reactflow and @xyflow/react
+const CustomNodeWrapper = (props: any) => {
+  // Convert ReactFlow NodeProps to @xyflow/react NodeProps format
+  const xyflowProps = {
+    ...props,
+    draggable: props.draggable ?? true,
+    selectable: props.selectable ?? true,
+    deletable: props.deletable ?? true,
+  };
+  return <CustomNodeComponent {...xyflowProps} />;
+};
+
 const nodeTypes: NodeTypes = {
-  custom: CustomNode,
+  custom: CustomNodeWrapper as any,
 };
 
 const edgeTypes: EdgeTypes = {
