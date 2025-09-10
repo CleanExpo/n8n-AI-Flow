@@ -1,0 +1,8 @@
+my-app
+WSL-Deployment-Sequential-Thinking
+playwright-mcp
+.git
+.github
+*.md
+.env*
+!.env.production
