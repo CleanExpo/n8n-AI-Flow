@@ -57,7 +57,7 @@ export class ContentExtractor {
       case 'json':
         return this.extractFromJSON(file);
       case 'xml':
-        return this.extractFromXML(file);
+        return this.extractFromHTML(file);
       case 'txt':
       case 'md':
         return this.extractFromText(file);
