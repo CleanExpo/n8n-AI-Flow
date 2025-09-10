@@ -50,16 +50,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { data, error } = await executionService.getExecutions(filter, user.id);
-
-    if (error) {
+    try {
+      const data = await executionService.getExecutions(filter);
+      return NextResponse.json({ data });
+    } catch (execError: any) {
+      console.error('Execution fetch error:', execError);
       return NextResponse.json(
-        { error: error.message },
+        { error: execError.message || 'Failed to fetch executions' },
         { status: 400 }
       );
     }
-
-    return NextResponse.json({ data });
   } catch (error) {
     console.error('Error fetching executions:', error);
     return NextResponse.json(
@@ -96,28 +96,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Look up the user ID from the users table using email
-    const { data: user, error: userError } = await supabase
-      .from('users')
-      .select('id')
-      .eq('email', session.user.email)
-      .single();
-
-    if (userError || !user) {
-      console.error('User lookup error:', userError);
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
-    }
-
-    // Add user_id to the execution
-    const executionData = {
-      ...body,
-      user_id: user.id
-    };
-
-    const { data, error } = await executionService.createExecution(executionData);
+    const { data, error } = await executionService.startExecution(body);
 
     if (error) {
       console.error('Execution creation error:', error);
