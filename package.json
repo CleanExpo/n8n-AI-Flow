@@ -8,5 +8,8 @@
     "dev": "cd my-app && npm run dev",
     "start": "cd my-app && npm run start"
   },
-  "workspaces": ["my-app"]
+  "workspaces": ["my-app"],
+  "dependencies": {
+    "next": "14.2.23"
+  }
 }
