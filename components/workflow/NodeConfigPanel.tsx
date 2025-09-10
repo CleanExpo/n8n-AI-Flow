@@ -149,7 +149,7 @@ export const NodeConfigPanel: React.FC<NodeConfigPanelProps> = ({ node, onClose 
                   type="text"
                   value={config[field.key] || ''}
                   onChange={(e) => handleConfigChange(field.key, e.target.value)}
-                  placeholder={field.placeholder}
+                  placeholder={(field as any).placeholder}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               )}
@@ -159,9 +159,9 @@ export const NodeConfigPanel: React.FC<NodeConfigPanelProps> = ({ node, onClose 
                   type="number"
                   value={config[field.key] || ''}
                   onChange={(e) => handleConfigChange(field.key, parseFloat(e.target.value))}
-                  min={field.min}
-                  max={field.max}
-                  step={field.step}
+                  min={(field as any).min}
+                  max={(field as any).max}
+                  step={(field as any).step}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               )}
@@ -170,7 +170,7 @@ export const NodeConfigPanel: React.FC<NodeConfigPanelProps> = ({ node, onClose 
                 <textarea
                   value={config[field.key] || ''}
                   onChange={(e) => handleConfigChange(field.key, e.target.value)}
-                  placeholder={field.placeholder}
+                  placeholder={(field as any).placeholder}
                   rows={4}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -178,11 +178,11 @@ export const NodeConfigPanel: React.FC<NodeConfigPanelProps> = ({ node, onClose 
               
               {field.type === 'select' && (
                 <select
-                  value={config[field.key] || field.options?.[0]}
+                  value={config[field.key] || (field as any).options?.[0]}
                   onChange={(e) => handleConfigChange(field.key, e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  {field.options?.map((option) => (
+                  {(field as any).options?.map((option: string) => (
                     <option key={option} value={option}>
                       {option}
                     </option>
