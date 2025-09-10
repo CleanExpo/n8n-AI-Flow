@@ -46,11 +46,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     // Stop n8n execution if it exists
-    if (execution.metadata?.n8n_execution_id) {
+    // Check if n8n execution ID is stored in trigger_data
+    if (execution.trigger_data?.n8n_execution_id) {
       try {
         // Note: n8n doesn't have a direct stop API, we'll mark it as cancelled in our DB
         // In production, you might want to implement a webhook or polling mechanism
-        console.log('Stopping n8n execution:', execution.metadata.n8n_execution_id);
+        console.log('Stopping n8n execution:', execution.trigger_data.n8n_execution_id);
       } catch (n8nError) {
         console.error('Failed to stop n8n execution:', n8nError);
       }
