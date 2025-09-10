@@ -139,12 +139,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           active: false,
         },
       });
+    } else {
+      // Invalid operation
+      return NextResponse.json(
+        { error: 'Invalid operation. Supported operations: sync, activate, deactivate' },
+        { status: 400 }
+      );
     }
-
-    return NextResponse.json({ 
-      success: true,
-      data: result?.data,
-    });
   } catch (error) {
     console.error('Error syncing workflow:', error);
     return NextResponse.json(
