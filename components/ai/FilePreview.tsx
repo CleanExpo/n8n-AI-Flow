@@ -82,8 +82,7 @@ export function FilePreview({
     try {
       // Create a File object from FileItem (simulation)
       const mockFile = new File(['mock content'], file.name, {
-        type: getMimeType(file.extension || ''),
-        lastModified: file.lastModified?.getTime() || Date.now()
+        type: getMimeType(file.extension || '')
       });
 
       // Extract content using the content extractor
