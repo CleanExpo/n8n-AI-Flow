@@ -1,9 +1,11 @@
 {
-  "root": "my-app",
+  "buildCommand": "cd my-app && npm run build",
+  "outputDirectory": "my-app/.next",
+  "installCommand": "cd my-app && npm install",
   "framework": "nextjs",
   "regions": ["iad1"],
   "functions": {
-    "app/api/**/*.ts": {
+    "my-app/app/api/**/*.ts": {
       "maxDuration": 30
     }
   }
