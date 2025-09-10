@@ -512,10 +512,10 @@ export default processData;`,
                               <span>{file.size.toLocaleString()} bytes</span>
                             </div>
                           )}
-                          {file.lastModified && (
+                          {file.modifiedAt && (
                             <div className="flex justify-between">
                               <span className="text-muted-foreground">Modified:</span>
-                              <span>{file.lastModified.toLocaleString()}</span>
+                              <span>{file.modifiedAt.toLocaleString()}</span>
                             </div>
                           )}
                         </div>
