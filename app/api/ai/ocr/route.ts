@@ -62,20 +62,23 @@ async function performOCR(imageBuffer: Buffer, mimeType: string) {
     // Extract workflow patterns from the text
     const workflowPatterns = analyzeTextForWorkflows(data.text);
     
+    // Cast data to any to access properties that might exist but aren't typed
+    const pageData = data as any;
+    
     return {
       text: data.text,
       confidence: data.confidence,
-      words: data.words?.map(word => ({
+      words: pageData.words?.map((word: any) => ({
         text: word.text,
         confidence: word.confidence,
         bbox: word.bbox
       })),
-      lines: data.lines?.map(line => ({
+      lines: pageData.lines?.map((line: any) => ({
         text: line.text,
         confidence: line.confidence,
         bbox: line.bbox
       })),
-      paragraphs: data.paragraphs?.map(para => ({
+      paragraphs: pageData.paragraphs?.map((para: any) => ({
         text: para.text,
         confidence: para.confidence,
         bbox: para.bbox
