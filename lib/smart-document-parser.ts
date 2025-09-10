@@ -46,7 +46,7 @@ export interface SmartParsingOptions {
 
 export class SmartDocumentParser {
   private options: SmartParsingOptions;
-  private nodeLibrary: Map<string, any>;
+  private nodeLibrary: Map<string, any> = new Map();
 
   constructor(options: SmartParsingOptions = {}) {
     this.options = {

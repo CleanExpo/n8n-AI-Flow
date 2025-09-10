@@ -441,15 +441,18 @@ or copy the workflow from the clipboard.
    */
   convertFromReactFlow(nodes: Node[], edges: Edge[], name: string): N8nWorkflow {
     // Convert nodes
-    const n8nNodes: N8nNode[] = nodes.map(node => ({
-      id: node.id,
-      name: node.data.label || node.id,
-      type: this.mapNodeType(node.data.type || node.type),
-      position: [node.position.x, node.position.y],
-      parameters: node.data.parameters || {},
-      typeVersion: this.getTypeVersion(node.data.type || node.type),
-      credentials: node.data.credentials
-    }));
+    const n8nNodes: N8nNode[] = nodes.map(node => {
+      const nodeData = node.data as any;
+      return {
+        id: node.id,
+        name: nodeData.label || node.id,
+        type: this.mapNodeType(nodeData.type || node.type),
+        position: [node.position.x, node.position.y],
+        parameters: nodeData.parameters || {},
+        typeVersion: this.getTypeVersion(nodeData.type || node.type),
+        credentials: nodeData.credentials
+      };
+    });
 
     // Convert connections
     const connections: N8nConnection = {};

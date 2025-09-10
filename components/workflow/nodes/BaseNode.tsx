@@ -3,7 +3,7 @@
 import React from 'react';
 import { Handle, Position, NodeProps } from '@xyflow/react';
 
-export interface BaseNodeData {
+export interface BaseNodeData extends Record<string, unknown> {
   label: string;
   icon?: string;
   description?: string;
@@ -13,10 +13,11 @@ export interface BaseNodeData {
   color?: string;
 }
 
-export const BaseNode: React.FC<NodeProps<BaseNodeData>> = ({ data, selected }) => {
-  const nodeColor = data.color || '#6366f1';
-  const inputCount = data.inputs || 1;
-  const outputCount = data.outputs || 1;
+export const BaseNode: React.FC<NodeProps> = ({ data, selected }) => {
+  const nodeData = data as BaseNodeData;
+  const nodeColor = nodeData.color || '#6366f1';
+  const inputCount = nodeData.inputs || 1;
+  const outputCount = nodeData.outputs || 1;
 
   return (
     <div
@@ -47,19 +48,19 @@ export const BaseNode: React.FC<NodeProps<BaseNodeData>> = ({ data, selected }) 
         className="px-4 py-2 rounded-t-lg text-white font-semibold flex items-center gap-2"
         style={{ backgroundColor: nodeColor }}
       >
-        {data.icon && <span className="text-lg">{data.icon}</span>}
-        <span className="text-sm">{data.label}</span>
+        {nodeData.icon && <span className="text-lg">{nodeData.icon}</span>}
+        <span className="text-sm">{nodeData.label}</span>
       </div>
 
       {/* Node Content */}
       <div className="px-4 py-3">
-        {data.description && (
-          <p className="text-xs text-gray-600 mb-2">{data.description}</p>
+        {nodeData.description && (
+          <p className="text-xs text-gray-600 mb-2">{nodeData.description}</p>
         )}
-        {data.config && Object.keys(data.config).length > 0 && (
+        {nodeData.config && Object.keys(nodeData.config).length > 0 && (
           <div className="text-xs bg-gray-50 rounded p-2 mt-2">
             <div className="font-semibold mb-1">Configuration:</div>
-            {Object.entries(data.config).map(([key, value]) => (
+            {Object.entries(nodeData.config).map(([key, value]) => (
               <div key={key} className="flex justify-between">
                 <span className="text-gray-600">{key}:</span>
                 <span className="text-gray-800 font-medium">
