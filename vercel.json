@@ -1,5 +1,4 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
+  "buildCommand": "npm run build && mkdir -p my-app && cp -r .next my-app/.next",
   "framework": "nextjs"
 }
