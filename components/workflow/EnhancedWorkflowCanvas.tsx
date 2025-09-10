@@ -18,7 +18,9 @@ import ReactFlow, {
   NodeTypes,
   EdgeTypes,
 } from 'reactflow';
-import type { Node, Edge } from '@xyflow/react';
+// Using ReactFlow's Node and Edge types
+type Node = any;
+type Edge = any;
 import 'reactflow/dist/style.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CustomNode } from './nodes/custom-nodes';

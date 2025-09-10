@@ -2,7 +2,22 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { Node, Edge } from '@xyflow/react';
+interface CustomNode {
+  id: string;
+  data: {
+    label?: string;
+    [key: string]: any;
+  };
+  position: { x: number; y: number };
+  [key: string]: any;
+}
+
+interface CustomEdge {
+  id: string;
+  source: string;
+  target: string;
+  [key: string]: any;
+}
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,8 +36,8 @@ import {
 } from 'lucide-react';
 
 interface DataFlowVisualizationProps {
-  nodes: Node[];
-  edges: Edge[];
+  nodes: CustomNode[];
+  edges: CustomEdge[];
   executionData?: any;
 }
 
@@ -104,9 +119,9 @@ export function DataFlowVisualization({
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const getNodeLabel = (nodeId: string) => {
+  const getNodeLabel = (nodeId: string): string => {
     const node = nodes.find(n => n.id === nodeId);
-    return node?.data?.label || nodeId;
+    return (node?.data?.label as string) || nodeId;
   };
 
   const getStatusColor = (status: DataPacket['status']) => {
