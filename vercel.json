@@ -1,13 +1,11 @@
 {
   "framework": "nextjs",
-  "installCommand": "npm install",
+  "buildCommand": "npm run build",
+  "installCommand": "ls -la && cat package.json | head -20 && npm install --verbose",
   "regions": ["iad1"],
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 30
     }
-  },
-  "git": {
-    "deploymentEnabled": true
   }
 }
