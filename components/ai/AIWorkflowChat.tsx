@@ -466,7 +466,7 @@ export function AIWorkflowChat({
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'chat' | 'files' | 'preview')} className="flex-1 flex flex-col">
         <TabsList className="w-full justify-start rounded-none border-b">
           <TabsTrigger value="chat">
             <Bot className="h-4 w-4 mr-2" />
