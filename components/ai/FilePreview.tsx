@@ -25,7 +25,8 @@ import {
   ChevronRight,
   Info,
   Search,
-  AlertCircle
+  AlertCircle,
+  Folder
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -533,7 +534,7 @@ export default processData;`,
 }
 
 function getFileIcon(file: FileItem) {
-  if (file.type === 'directory') return <Folder className="h-5 w-5" />;
+  if (file.type === 'folder') return <Folder className="h-5 w-5" />;
   
   const ext = file.extension?.toLowerCase();
   switch (ext) {

@@ -38,8 +38,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     }
 
     // Send to error monitoring service (e.g., Sentry)
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'exception', {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'exception', {
         description: error.message,
         fatal: false
       });
@@ -132,8 +132,8 @@ export function useErrorHandler() {
     console.error('Error caught by useErrorHandler:', error, errorInfo);
     
     // Send to error monitoring
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'exception', {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'exception', {
         description: error.message,
         fatal: false
       });
@@ -148,8 +148,8 @@ export function AsyncErrorBoundary({ children }: { children: ReactNode }) {
       console.error('Unhandled promise rejection:', event.reason);
       
       // Send to error monitoring
-      if (typeof window !== 'undefined' && window.gtag) {
-        window.gtag('event', 'exception', {
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'exception', {
           description: `Unhandled Promise Rejection: ${event.reason}`,
           fatal: false
         });
