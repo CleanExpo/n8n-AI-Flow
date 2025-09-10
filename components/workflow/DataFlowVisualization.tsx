@@ -2,22 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-interface CustomNode {
-  id: string;
-  data: {
-    label?: string;
-    [key: string]: any;
-  };
-  position: { x: number; y: number };
-  [key: string]: any;
-}
-
-interface CustomEdge {
-  id: string;
-  source: string;
-  target: string;
-  [key: string]: any;
-}
+import type { Node, Edge } from '@xyflow/react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -36,8 +21,8 @@ import {
 } from 'lucide-react';
 
 interface DataFlowVisualizationProps {
-  nodes: CustomNode[];
-  edges: CustomEdge[];
+  nodes: Node[];
+  edges: Edge[];
   executionData?: any;
 }
 
