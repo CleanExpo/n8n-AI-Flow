@@ -251,7 +251,7 @@ export function AIWorkflowChat({
         role: 'assistant',
         content: responseContent,
         workflowPreview: apiData.workflow || generatedWorkflow,
-        generatedWorkflow: generatedWorkflow,
+        generatedWorkflow: generatedWorkflow || undefined,
         extractedContent: allExtractedContent,
         timestamp: new Date(),
         status: 'complete'
