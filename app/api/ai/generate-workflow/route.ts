@@ -6,7 +6,7 @@ import { authOptions } from '@/lib/auth';
 async function generateWorkflowFromPrompt(
   message: string,
   attachments: any[],
-  context: any[]
+  _context: any[]
 ) {
   // For now, we'll create a sample workflow generator
   // In production, this would call your LLM API
@@ -111,7 +111,7 @@ async function generateWorkflowFromPrompt(
       
       if (attachment.type === 'file' && attachment.content) {
         try {
-          const parsed = JSON.parse(attachment.content);
+          const _parsed = JSON.parse(attachment.content);
           // If it's a JSON file, add appropriate nodes
           workflow.nodes.push({
             id: `json_parser_${Date.now()}`,
@@ -189,7 +189,7 @@ async function generateWorkflowFromPrompt(
   return { workflow, explanation };
 }
 
-function generateExplanation(workflow: any, originalMessage: string): string {
+function generateExplanation(workflow: any, _originalMessage: string): string {
   const nodeCount = workflow.nodes.length;
   const connectionCount = workflow.connections.length;
   

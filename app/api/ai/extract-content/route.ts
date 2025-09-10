@@ -62,7 +62,7 @@ async function extractContent(file: File): Promise<{
 
         metadata.structure = Object.keys(jsonData);
         metadata.isConfig = true;
-      } catch (e) {
+      } catch {
         // Not valid JSON
       }
     }
@@ -194,7 +194,7 @@ async function extractContent(file: File): Promise<{
 
 // Generate workflow nodes based on extracted content
 function generateWorkflowSuggestions(extractedData: any) {
-  const suggestions = [];
+  const _suggestions = [];
   const nodes = [];
 
   for (const hint of extractedData.workflowHints) {

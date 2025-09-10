@@ -11,9 +11,7 @@ import {
   Bot,
   Workflow,
   Save,
-  Play,
   Upload,
-  ArrowLeft,
   Sparkles,
   Eye,
   EyeOff,
@@ -33,13 +31,13 @@ export default function AIWorkflowPage() {
     nodes,
     edges,
     addNode,
-    updateNode,
-    deleteNode,
+    updateNode: _updateNode,
+    deleteNode: _deleteNode,
     addEdge,
-    updateEdge,
-    deleteEdge,
+    updateEdge: _updateEdge,
+    deleteEdge: _deleteEdge,
     reset,
-    saveWorkflow
+    saveWorkflow: _saveWorkflow
   } = useWorkflowStore();
 
   const handleWorkflowGenerated = (workflow: any) => {
@@ -139,7 +137,7 @@ export default function AIWorkflowPage() {
         });
         router.push(`/workflows/${data.id}`);
       }
-    } catch (error) {
+    } catch {
       toast({
         title: 'Save Failed',
         description: 'Failed to save workflow',
@@ -188,7 +186,7 @@ export default function AIWorkflowPage() {
         });
         router.push(`/workflows/${savedWorkflow.id}`);
       }
-    } catch (error) {
+    } catch {
       toast({
         title: 'Deployment Failed',
         description: 'Failed to deploy workflow to n8n',

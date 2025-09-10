@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { applySecurityHeaders } from '@/lib/security/headers';
 
 export default withAuth(
-  function middleware(req) {
+  function middleware(_req) {
     const response = NextResponse.next();
     return applySecurityHeaders(response);
   },

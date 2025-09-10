@@ -235,7 +235,7 @@ async function monitorN8nExecution(
 /**
  * Simulate workflow execution (placeholder for actual execution engine)
  */
-async function simulateWorkflowExecution(
+async function _simulateWorkflowExecution(
   supabase: any,
   executionId: string,
   workflow: any

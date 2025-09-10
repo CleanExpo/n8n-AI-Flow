@@ -209,7 +209,7 @@ function detectLanguages(text: string): string[] {
 }
 
 // Alternative implementation using Google Vision API (if configured)
-async function performOCRWithGoogleVision(imageBuffer: Buffer): Promise<any> {
+async function _performOCRWithGoogleVision(imageBuffer: Buffer): Promise<any> {
   if (!process.env.GOOGLE_CLOUD_API_KEY) {
     throw new Error('Google Cloud API key not configured');
   }
@@ -256,7 +256,7 @@ async function performOCRWithGoogleVision(imageBuffer: Buffer): Promise<any> {
 }
 
 // Alternative implementation using Azure Computer Vision (if configured)
-async function performOCRWithAzure(imageBuffer: Buffer): Promise<any> {
+async function _performOCRWithAzure(imageBuffer: Buffer): Promise<any> {
   if (!process.env.AZURE_COMPUTER_VISION_KEY || !process.env.AZURE_COMPUTER_VISION_ENDPOINT) {
     throw new Error('Azure Computer Vision not configured');
   }

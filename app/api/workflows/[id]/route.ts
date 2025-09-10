@@ -115,7 +115,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     const supabase = createAdminClient();
     const workflowService = new WorkflowService(supabase);
 
-    const { data, error } = await workflowService.deleteWorkflow(id);
+    const { data: _data, error } = await workflowService.deleteWorkflow(id);
 
     if (error) {
       return NextResponse.json(

@@ -33,7 +33,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { id } = await params;
     const supabase = createAdminClient();
     const executionService = new ExecutionService(supabase);
-    const n8nService = new N8nService(n8nCredentials);
+    const _n8nService = new N8nService(n8nCredentials);
 
     // Get execution details
     const { data: execution, error } = await executionService.getExecutionWithLogs(id);

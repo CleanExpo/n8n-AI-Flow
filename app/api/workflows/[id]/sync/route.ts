@@ -63,7 +63,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         // Update existing n8n workflow
         try {
           result = await n8nService.updateWorkflow(n8nWorkflowId, n8nWorkflow);
-        } catch (error) {
+        } catch {
           // If update fails, try creating a new one
           result = await n8nService.createWorkflow(n8nWorkflow);
           n8nWorkflowId = result.data.id;
@@ -203,7 +203,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           nodeCount: n8nWorkflow.nodes.length,
         },
       });
-    } catch (error) {
+    } catch {
       return NextResponse.json({
         synced: false,
         error: 'Failed to fetch n8n workflow status',

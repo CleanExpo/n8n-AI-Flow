@@ -279,7 +279,7 @@ function enhanceGeneratedWorkflow(workflow: any): GeneratedWorkflow {
 function generateWorkflowFromPatterns(
   message: string,
   fileContent?: string,
-  attachments?: any[]
+  _attachments?: any[]
 ): GeneratedWorkflow {
   const nodes: WorkflowNode[] = [];
   const connections: WorkflowConnection[] = [];
