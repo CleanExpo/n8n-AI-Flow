@@ -269,7 +269,7 @@ async function performOCRWithAzure(imageBuffer: Buffer): Promise<any> {
         'Ocp-Apim-Subscription-Key': process.env.AZURE_COMPUTER_VISION_KEY,
         'Content-Type': 'application/octet-stream'
       },
-      body: imageBuffer
+      body: imageBuffer as any
     }
   );
 
