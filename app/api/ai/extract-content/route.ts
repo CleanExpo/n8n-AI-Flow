@@ -14,7 +14,7 @@ async function extractContent(file: File): Promise<{
   const extension = fileName.split('.').pop() || '';
 
   let content = '';
-  let metadata = {
+  let metadata: Record<string, any> = {
     fileName: file.name,
     fileSize: file.size,
     fileType: file.type,
