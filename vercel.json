@@ -1,7 +1,5 @@
 {
-  "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
-  "installCommand": "npm install",
+  "root": "my-app",
   "framework": "nextjs",
   "regions": ["iad1"],
   "functions": {
