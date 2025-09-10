@@ -685,9 +685,6 @@ export function AIWorkflowChat({
         <TabsContent value="files" className="flex-1 m-0">
           <EnhancedFileBrowser
             onFilesSelected={handleFilesSelected}
-            allowMultiple={true}
-            allowFolders={true}
-            showPreview={true}
             className="h-full"
           />
         </TabsContent>
