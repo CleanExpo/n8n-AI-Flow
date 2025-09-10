@@ -412,8 +412,8 @@ export default processData;`,
                 <h2 className="font-semibold truncate">{file.name}</h2>
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                   {file.size && <span>{Math.round(file.size / 1024)}KB</span>}
-                  {file.lastModified && (
-                    <span>{file.lastModified.toLocaleDateString()}</span>
+                  {file.modifiedAt && (
+                    <span>{file.modifiedAt.toLocaleDateString()}</span>
                   )}
                   {file.extension && (
                     <Badge variant="secondary" className="text-xs">
