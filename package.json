@@ -1,0 +1,13 @@
+{
+  "name": "n8n-ai-flow-monorepo",
+  "version": "1.0.0",
+  "description": "n8n AI Flow - Monorepo with Next.js app in my-app subdirectory",
+  "private": true,
+  "scripts": {
+    "build": "cd my-app && npm run build",
+    "dev": "cd my-app && npm run dev",
+    "start": "cd my-app && npm run start",
+    "install": "cd my-app && npm install"
+  },
+  "workspaces": ["my-app"]
+}
