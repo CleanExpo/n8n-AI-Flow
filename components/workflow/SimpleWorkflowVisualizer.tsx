@@ -116,7 +116,7 @@ function SimpleWorkflowVisualizerInner({ workflow }: SimpleWorkflowVisualizerPro
 
   // Convert n8n workflow to ReactFlow format
   const { flowNodes, flowEdges } = useMemo(() => {
-    if (!workflow?.nodes) {
+    if (!workflow?.nodes || workflow.nodes.length === 0) {
       return { flowNodes: [], flowEdges: [] };
     }
 

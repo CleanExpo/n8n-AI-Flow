@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { N8nWorkflowBuilder, N8N_NODE_TYPES } from '@/lib/n8n-workflow-builder';
+import { WorkflowGenerator } from '@/lib/workflow-generator';
 
 // Initialize OpenAI client lazily to avoid build-time errors
 let openai: OpenAI | null = null;
@@ -90,54 +92,17 @@ export async function POST(request: NextRequest) {
     let workflowData;
     try {
       workflowData = JSON.parse(response);
+      // If OpenAI didn't provide a workflow, generate one
+      if (!workflowData.workflow) {
+        workflowData.workflow = WorkflowGenerator.generateWorkflow(idea);
+      }
     } catch (parseError) {
-      // If parsing fails, create a basic workflow
+      // If parsing fails, generate a real workflow based on the idea
+      const generatedWorkflow = WorkflowGenerator.generateWorkflow(idea);
+      
       workflowData = {
-        workflow: {
-          name: "AI Generated Workflow",
-          nodes: [
-            {
-              id: "1",
-              name: "Start",
-              type: "n8n-nodes-base.start",
-              position: [250, 300],
-              parameters: {}
-            },
-            {
-              id: "2",
-              name: "Process",
-              type: "n8n-nodes-base.set",
-              position: [450, 300],
-              parameters: {
-                values: {
-                  string: [
-                    {
-                      name: "data",
-                      value: "={{$json}}"
-                    }
-                  ]
-                }
-              }
-            }
-          ],
-          connections: {
-            "Start": {
-              "main": [
-                [
-                  {
-                    "node": "Process",
-                    "type": "main",
-                    "index": 0
-                  }
-                ]
-              ]
-            }
-          },
-          settings: {
-            executionOrder: "v1"
-          }
-        },
-        explanation: `I'll help you create a workflow for: ${idea}`,
+        workflow: generatedWorkflow,
+        explanation: `I've created a workflow based on your request: "${idea}". This workflow includes the necessary nodes to accomplish your automation task.`,
         nextSteps: [
           {
             label: "⚡ Choose Trigger Type",

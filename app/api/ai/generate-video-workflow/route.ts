@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { N8nWorkflowBuilder, N8N_NODE_TYPES } from '@/lib/n8n-workflow-builder';
 
 // Initialize OpenAI client lazily to avoid build-time errors
 let openai: OpenAI | null = null;
@@ -191,45 +192,46 @@ export async function POST(req: NextRequest) {
 }
 
 function createVideoProductionTemplate(idea: string) {
-  return {
-    workflow: {
-      name: "AI Video Production Pipeline",
-      nodes: [
-        {
-          id: "1",
-          name: "Google Sheets Trigger",
-          type: "n8n-nodes-base.googleSheets",
-          typeVersion: 2,
-          position: [250, 300],
-          parameters: {
-            operation: "trigger",
-            sheetId: "YOUR_SHEET_ID",
-            range: "A:Z"
-          }
-        },
-        {
-          id: "2", 
-          name: "Generate Script",
-          type: "n8n-nodes-base.openAi",
-          typeVersion: 1,
-          position: [500, 300],
-          parameters: {
-            resource: "text",
-            operation: "complete",
-            prompt: "={{ $json.idea }}",
-            maxTokens: 2000
-          }
-        },
-        {
-          id: "3",
-          name: "Split Into Scenes",
-          type: "n8n-nodes-base.function",
-          typeVersion: 1,
-          position: [750, 300],
-          parameters: {
-            functionCode: `
-// Split script into scenes
-const script = items[0].json.script;
+  const builder = new N8nWorkflowBuilder('AI Video Production Pipeline');
+  
+  // Add Google Sheets trigger to monitor for new video ideas
+  const sheetsTrigger = builder.addNode('Video Ideas Sheet', {
+    type: 'n8n-nodes-base.googleSheets',
+    typeVersion: 4,
+    parameters: {
+      operation: 'read',
+      documentId: '{{ $credentials.documentId }}',
+      sheetName: 'Ideas',
+      options: {
+        returnAll: true
+      }
+    }
+  });
+  builder.setNodePosition(sheetsTrigger, 250, 300);
+  
+  // Add OpenAI for script generation
+  const scriptGen = builder.addNode('Generate Script', N8N_NODE_TYPES.OPENAI, {
+    messages: {
+      values: [{
+        role: 'system',
+        content: 'You are a professional video script writer. Create engaging scripts for YouTube videos.'
+      }, {
+        role: 'user',
+        content: '={{ $json.idea }}'
+      }]
+    },
+    model: 'gpt-4',
+    options: {
+      temperature: 0.7,
+      maxTokens: 2000
+    }
+  });
+  builder.setNodePosition(scriptGen, 500, 300);
+  
+  // Add scene splitter
+  const sceneSplitter = builder.addNode('Split Into Scenes', N8N_NODE_TYPES.CODE, {
+    jsCode: `// Split script into scenes for video generation
+const script = items[0].json.choices[0].message.content;
 const scenes = script.split('\\n\\n').filter(s => s.trim());
 return scenes.map((scene, index) => ({
   json: {
@@ -238,146 +240,88 @@ return scenes.map((scene, index) => ({
     originalIdea: items[0].json.idea
   }
 }));`
-          }
-        },
-        {
-          id: "4",
-          name: "Generate Video Clips",
-          type: "n8n-nodes-base.httpRequest",
-          typeVersion: 3,
-          position: [1000, 200],
-          parameters: {
-            method: "POST",
-            url: "https://api.replicate.com/v1/predictions",
-            authentication: "genericCredentialType",
-            genericAuthType: "httpHeaderAuth",
-            sendHeaders: true,
-            headerParameters: {
-              parameters: [
-                {
-                  name: "Authorization",
-                  value: "Token YOUR_REPLICATE_TOKEN"
-                }
-              ]
-            },
-            sendBody: true,
-            bodyParameters: {
-              parameters: [
-                {
-                  name: "version",
-                  value: "model-version-id"
-                },
-                {
-                  name: "input",
-                  value: "={{ { prompt: $json.sceneText } }}"
-                }
-              ]
-            }
-          }
-        },
-        {
-          id: "5",
-          name: "Generate Voiceover",
-          type: "n8n-nodes-base.httpRequest",
-          typeVersion: 3,
-          position: [1000, 400],
-          parameters: {
-            method: "POST",
-            url: "https://api.elevenlabs.io/v1/text-to-speech/voice-id",
-            authentication: "genericCredentialType",
-            genericAuthType: "httpHeaderAuth",
-            sendHeaders: true,
-            headerParameters: {
-              parameters: [
-                {
-                  name: "xi-api-key",
-                  value: "YOUR_ELEVENLABS_KEY"
-                }
-              ]
-            },
-            sendBody: true,
-            bodyParameters: {
-              parameters: [
-                {
-                  name: "text",
-                  value: "={{ $json.sceneText }}"
-                },
-                {
-                  name: "voice_settings",
-                  value: "={{ { stability: 0.5, similarity_boost: 0.5 } }}"
-                }
-              ]
-            }
-          }
-        },
-        {
-          id: "6",
-          name: "Merge Media",
-          type: "n8n-nodes-base.merge",
-          typeVersion: 2,
-          position: [1250, 300],
-          parameters: {
-            mode: "combine",
-            combinationMode: "mergeByPosition"
-          }
-        },
-        {
-          id: "7",
-          name: "Assemble Video",
-          type: "n8n-nodes-base.executeCommand",
-          typeVersion: 1,
-          position: [1500, 300],
-          parameters: {
-            command: "ffmpeg -i video.mp4 -i audio.mp3 -c:v copy -c:a aac output.mp4"
-          }
-        },
-        {
-          id: "8",
-          name: "Upload to YouTube",
-          type: "n8n-nodes-base.youtube",
-          typeVersion: 1,
-          position: [1750, 300],
-          parameters: {
-            operation: "upload",
-            title: "={{ $json.title }}",
-            description: "={{ $json.description }}",
-            tags: "={{ $json.tags }}",
-            categoryId: "22"
-          }
-        }
-      ],
-      connections: {
-        "Google Sheets Trigger": {
-          "main": [[{ "node": "Generate Script", "type": "main", "index": 0 }]]
-        },
-        "Generate Script": {
-          "main": [[{ "node": "Split Into Scenes", "type": "main", "index": 0 }]]
-        },
-        "Split Into Scenes": {
-          "main": [
-            [
-              { "node": "Generate Video Clips", "type": "main", "index": 0 },
-              { "node": "Generate Voiceover", "type": "main", "index": 0 }
-            ]
-          ]
-        },
-        "Generate Video Clips": {
-          "main": [[{ "node": "Merge Media", "type": "main", "index": 0 }]]
-        },
-        "Generate Voiceover": {
-          "main": [[{ "node": "Merge Media", "type": "main", "index": 1 }]]
-        },
-        "Merge Media": {
-          "main": [[{ "node": "Assemble Video", "type": "main", "index": 0 }]]
-        },
-        "Assemble Video": {
-          "main": [[{ "node": "Upload to YouTube", "type": "main", "index": 0 }]]
-        }
-      },
-      settings: {
-        executionOrder: "v1"
-      }
+  });
+  builder.setNodePosition(sceneSplitter, 750, 300);
+  
+  // Add video generation via Replicate API
+  const videoGen = builder.addNode('Generate Video Clips', N8N_NODE_TYPES.HTTP_REQUEST, {
+    method: 'POST',
+    url: 'https://api.replicate.com/v1/predictions',
+    authentication: 'genericCredentialType',
+    genericAuthType: 'httpHeaderAuth',
+    sendHeaders: true,
+    headerParameters: {
+      parameters: [{
+        name: 'Authorization',
+        value: '={{ "Token " + $credentials.replicateApiKey }}'
+      }]
     },
+    sendBody: true,
+    specifyBody: 'json',
+    jsonBody: '={{ { "version": "model-version-id", "input": { "prompt": $json.sceneText } } }}'
+  });
+  builder.setNodePosition(videoGen, 1000, 200);
+  
+  // Add voiceover generation via ElevenLabs
+  const voiceGen = builder.addNode('Generate Voiceover', N8N_NODE_TYPES.HTTP_REQUEST, {
+    method: 'POST',
+    url: 'https://api.elevenlabs.io/v1/text-to-speech/voice-id',
+    authentication: 'genericCredentialType',
+    genericAuthType: 'httpHeaderAuth',
+    sendHeaders: true,
+    headerParameters: {
+      parameters: [{
+        name: 'xi-api-key',
+        value: '={{ $credentials.elevenLabsApiKey }}'
+      }]
+    },
+    sendBody: true,
+    specifyBody: 'json',
+    jsonBody: '={{ { "text": $json.sceneText, "voice_settings": { "stability": 0.5, "similarity_boost": 0.5 } } }}'
+  });
+  builder.setNodePosition(voiceGen, 1000, 400);
+  
+  // Add merge node to combine video and audio
+  const merge = builder.addNode('Merge Media', N8N_NODE_TYPES.MERGE, {
+    mode: 'combine',
+    combinationMode: 'mergeByPosition'
+  });
+  builder.setNodePosition(merge, 1250, 300);
+  
+  // Add FFmpeg command to assemble video
+  const assemble = builder.addNode('Assemble Video', N8N_NODE_TYPES.EXECUTE_COMMAND, {
+    command: 'ffmpeg -i {{ $json.videoFile }} -i {{ $json.audioFile }} -c:v copy -c:a aac {{ $json.outputFile }}'
+  });
+  builder.setNodePosition(assemble, 1500, 300);
+  
+  // Add YouTube upload
+  const youtube = builder.addNode('Upload to YouTube', {
+    type: 'n8n-nodes-base.youtube',
+    typeVersion: 2,
+    parameters: {
+      resource: 'video',
+      operation: 'upload',
+      title: '={{ $json.title }}',
+      description: '={{ $json.description }}',
+      tags: '={{ $json.tags }}',
+      categoryId: '22',
+      privacyStatus: 'private'
+    }
+  });
+  builder.setNodePosition(youtube, 1750, 300);
+  
+  // Connect all nodes
+  builder.connect(sheetsTrigger, scriptGen);
+  builder.connect(scriptGen, sceneSplitter);
+  builder.connect(sceneSplitter, videoGen);
+  builder.connect(sceneSplitter, voiceGen);
+  builder.connect(videoGen, merge, 0);
+  builder.connect(voiceGen, merge, 0);
+  builder.connect(merge, assemble);
+  builder.connect(assemble, youtube);
+  
+  return {
+    workflow: builder.build(),
     message: "🎬 I've created a complete AI video production workflow! This automated pipeline will:\n\n1. **Monitor Google Sheets** for new video ideas\n2. **Generate Scripts** using AI to expand your ideas into compelling narratives\n3. **Create Video Content** with AI-powered video generation (Replicate/Runway)\n4. **Generate Voiceovers** with natural-sounding AI voices (ElevenLabs)\n5. **Assemble Everything** using FFmpeg to create the final video\n6. **Publish to YouTube** automatically with optimized metadata\n\nThis workflow can produce professional videos without any manual editing!",
     nextSteps: [
       {
