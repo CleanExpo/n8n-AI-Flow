@@ -43,7 +43,7 @@ import {
   DropdownMenuCheckboxItem,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
-import { useReactFlow } from 'reactflow';
+import { useReactFlow } from '@xyflow/react';
 
 interface WorkflowControlsProps {
   onExecute?: () => void;
