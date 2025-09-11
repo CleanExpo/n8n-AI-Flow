@@ -470,7 +470,7 @@ export function SimplifiedWorkflowChat({ initialIdea, onWorkflowGenerated }: Sim
                                 <span className="mr-2">{node.icon}</span>
                                 {node.name}
                               </Badge>
-                              {idx < message.workflow.nodes.length - 1 && (
+                              {idx < (message.workflow?.nodes.length || 0) - 1 && (
                                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
                               )}
                             </div>
