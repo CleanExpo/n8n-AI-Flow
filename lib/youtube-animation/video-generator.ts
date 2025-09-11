@@ -91,18 +91,16 @@ export class VideoGenerator {
     const wordCount = this.config.content.script.split(' ').length;
     const estimatedDuration = (wordCount / 150) * 60; // 150 words per minute
     
-    if (estimatedDuration > template.duration) {
+    if (estimatedDuration > (template.duration || 0)) {
       template.duration = Math.ceil(estimatedDuration);
     }
 
     // Adjust style based on content urgency
     if (analysis.urgency === 'high') {
       // Increase animation speed and intensity
-      template.elements.forEach(element => {
-        if (element.animations) {
-          element.animations.forEach(anim => {
-            anim.duration *= 0.8; // Speed up animations
-          });
+      template.animations?.forEach(animation => {
+        if (animation.duration) {
+          animation.duration *= 0.8; // Speed up animations
         }
       });
     }
@@ -172,7 +170,7 @@ export class VideoGenerator {
     });
 
     // Content Scenes (5 seconds to end-10)
-    const keyPointDuration = (template.duration - 15) / content.keyPoints.length;
+    const keyPointDuration = ((template.duration || 60) - 15) / content.keyPoints.length;
     content.keyPoints.forEach((point, index) => {
       scenes.push({
         id: `content_${index}`,
