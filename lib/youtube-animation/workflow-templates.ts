@@ -22,6 +22,7 @@ export interface AnimationTemplate {
   animations: any[];
   transitions: any[];
   duration?: number;
+  audioProfile?: any;
 }
 
 export const aiRevolutionTemplate: AnimationTemplate = {
