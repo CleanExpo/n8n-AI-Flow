@@ -1,5 +1,8 @@
 'use client';
 
+// Force dynamic rendering to handle useSession
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from 'react';
 import { WorkflowCanvas } from '@/components/workflow/WorkflowCanvas';
 import { useWorkflowStore } from '@/lib/stores/workflow-store';

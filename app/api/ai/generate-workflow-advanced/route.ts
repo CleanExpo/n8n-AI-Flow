@@ -3,10 +3,17 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import OpenAI from 'openai';
 
-// Initialize OpenAI if available
-const openai = process.env.OPENAI_API_KEY 
-  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-  : null;
+// Initialize OpenAI client lazily to avoid build-time errors
+let openai: OpenAI | null = null;
+
+function getOpenAIClient() {
+  if (!openai && process.env.OPENAI_API_KEY) {
+    openai = new OpenAI({ 
+      apiKey: process.env.OPENAI_API_KEY || 'dummy-key-for-build' 
+    });
+  }
+  return openai;
+}
 
 interface WorkflowNode {
   id: string;
@@ -167,7 +174,8 @@ async function generateWorkflowWithOpenAI(
   prompt: string,
   context: any
 ): Promise<GeneratedWorkflow> {
-  if (!openai) {
+  const client = getOpenAIClient();
+  if (!client) {
     throw new Error('OpenAI not configured');
   }
 
@@ -219,7 +227,7 @@ Requirements:
 6. Create proper connections between nodes`;
 
   try {
-    const completion = await openai.chat.completions.create({
+    const completion = await client.chat.completions.create({
       model: 'gpt-4-turbo-preview',
       messages: [
         { role: 'system', content: systemPrompt },

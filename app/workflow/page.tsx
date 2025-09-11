@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { SimplifiedWorkflowChat } from '@/components/ai/SimplifiedWorkflowChat';
@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-export default function WorkflowBuilderPage() {
+function WorkflowBuilderContent() {
   const searchParams = useSearchParams();
   const idea = searchParams.get('idea') || '';
   const [viewMode, setViewMode] = useState<'visual' | 'code'>('visual');
@@ -173,5 +173,17 @@ export default function WorkflowBuilderPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function WorkflowBuilderPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <WorkflowBuilderContent />
+    </Suspense>
   );
 }

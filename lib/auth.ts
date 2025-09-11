@@ -3,10 +3,17 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcryptjs';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Lazy initialize Supabase client to avoid build-time errors
+let supabase: ReturnType<typeof createClient> | null = null;
+
+function getSupabaseClient() {
+  if (!supabase) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://dummy.supabase.co';
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || 'dummy-key-for-build';
+    supabase = createClient(url, key);
+  }
+  return supabase;
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -22,7 +29,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         // Check if user exists
-        const { data: user, error } = await supabase
+        const { data: user, error } = await getSupabaseClient()
           .from('users')
           .select('*')
           .eq('email', credentials.email)
@@ -32,7 +39,7 @@ export const authOptions: NextAuthOptions = {
           // If user doesn't exist, create new user (sign up)
           const hashedPassword = await bcrypt.hash(credentials.password, 10);
           
-          const { data: newUser, error: createError } = await supabase
+          const { data: newUser, error: createError } = await getSupabaseClient()
             .from('users')
             .insert({
               email: credentials.email,
@@ -63,7 +70,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         // Update last login
-        await supabase
+        await getSupabaseClient()
           .from('users')
           .update({ last_login: new Date().toISOString() })
           .eq('id', user.id);

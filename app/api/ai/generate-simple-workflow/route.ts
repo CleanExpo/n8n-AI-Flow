@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize OpenAI client lazily to avoid build-time errors
+let openai: OpenAI | null = null;
+
+function getOpenAIClient() {
+  if (!openai) {
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY || 'dummy-key-for-build',
+    });
+  }
+  return openai;
+}
 
 const SYSTEM_PROMPT = `You are an n8n workflow expert. Generate complete, working n8n workflows from user descriptions.
 
@@ -62,7 +70,7 @@ export async function POST(request: NextRequest) {
       ? `Previous context: ${JSON.stringify(context)}\n\nNew request: ${idea}`
       : `Create a workflow for: ${idea}`;
 
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAIClient().chat.completions.create({
       model: "gpt-4",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
