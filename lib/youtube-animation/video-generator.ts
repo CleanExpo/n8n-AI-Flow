@@ -142,7 +142,10 @@ export class VideoGenerator {
       type,
       urgency,
       technicalLevel,
-      targetAudience: type === 'tutorial' ? 'general' : 'technical'
+      targetAudience: type === 'tutorial' ? 'general' : 'technical',
+      keywords: [],
+      sentiment: 'neutral',
+      topics: []
     };
   }
 
