@@ -64,7 +64,7 @@ export function AnimatedEdge({
             }}
             className="px-2 py-1 bg-background border rounded-md shadow-sm"
           >
-            {data.label}
+            {data?.label as string}
           </div>
         </EdgeLabelRenderer>
       )}
