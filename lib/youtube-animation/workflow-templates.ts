@@ -1,6 +1,17 @@
 // Simplified workflow templates - no longer needed with AI-first approach
 // Keeping minimal exports to avoid breaking existing code
 
+export interface AnimationElement {
+  type: string;
+  properties: any;
+}
+
+export interface ContentAnalysis {
+  keywords: string[];
+  sentiment: string;
+  topics: string[];
+}
+
 export interface AnimationTemplate {
   name: string;
   style: any;
