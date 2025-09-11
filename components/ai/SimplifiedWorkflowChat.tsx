@@ -107,8 +107,19 @@ export function SimplifiedWorkflowChat({
     });
 
     try {
+      // Detect if this is a video production workflow request
+      const isVideoWorkflow = idea.toLowerCase().includes('video') || 
+                             idea.toLowerCase().includes('youtube') ||
+                             idea.toLowerCase().includes('ai-generated') ||
+                             idea.toLowerCase().includes('automate') && idea.toLowerCase().includes('production');
+
+      // Use appropriate API endpoint
+      const apiEndpoint = isVideoWorkflow 
+        ? '/api/ai/generate-video-workflow' 
+        : '/api/ai/generate-simple-workflow';
+
       // Call the actual API
-      const response = await fetch('/api/ai/generate-simple-workflow', {
+      const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -123,66 +134,49 @@ export function SimplifiedWorkflowChat({
       const data = await response.json();
 
       // Add assistant response with the actual workflow
-      addMessage({
-        role: 'assistant',
-        content: data.message || `I understand you want to: "${idea}". Let me create a workflow for you!`,
-      });
+      if (data.message && !data.workflow) {
+        addMessage({
+          role: 'assistant',
+          content: data.message,
+        });
+      }
 
-      // Parse and use the generated workflow
-      const workflow = data.workflow || {
-        nodes: [
-          { id: '1', type: 'n8n-nodes-base.manualTrigger', name: 'Manual Trigger', position: [250, 300], typeVersion: 1 },
-          { id: '2', type: 'n8n-nodes-base.httpRequest', name: 'HTTP Request', position: [450, 300], typeVersion: 1 },
-          { id: '3', type: 'n8n-nodes-base.set', name: 'Set Data', position: [650, 300], typeVersion: 1 },
-        ],
-        connections: {
-          'Manual Trigger': {
-            main: [[{ node: 'HTTP Request', type: 'main', index: 0 }]]
-          },
-          'HTTP Request': {
-            main: [[{ node: 'Set Data', type: 'main', index: 0 }]]
-          }
-        },
-      };
+      // Only use the workflow if it exists
+      if (data.workflow) {
+        const workflow = data.workflow;
+        
+        addMessage({
+          role: 'assistant',
+          content: data.message || 'Here\'s your initial workflow! I\'ve created a structure that we can customize together.',
+          workflow: workflow,
+        });
 
-      addMessage({
-        role: 'assistant',
-        content: 'Here\'s your initial workflow! I\'ve created a basic structure that we can customize together.',
-        workflow: workflow,
-      });
-
-      setCurrentWorkflow(workflow);
-      if (onWorkflowGenerated) {
-        onWorkflowGenerated(workflow);
+        setCurrentWorkflow(workflow);
+        if (onWorkflowGenerated) {
+          onWorkflowGenerated(workflow);
+        }
       }
 
       // Add next steps with options from API response
-      const options = data.nextSteps || [
-        {
-          label: 'Add more nodes',
-          value: 'add_nodes',
-          icon: Plus,
-          description: 'Expand your workflow with additional steps',
-        },
-        {
-          label: 'Test workflow',
-          value: 'test',
-          icon: Play,
-          description: 'Run with sample data to see it in action',
-        },
-        {
-          label: 'Export to n8n',
-          value: 'export',
-          icon: Download,
-          description: 'Get the JSON to import into n8n',
-        },
-      ];
+      if (data.nextSteps && data.nextSteps.length > 0) {
+        const options = data.nextSteps.map((step: any) => ({
+          ...step,
+          icon: step.value === 'add_nodes' ? Plus :
+                step.value === 'test' ? Play :
+                step.value === 'export' ? Download :
+                step.value === 'save' ? Save :
+                step.value === 'share' ? Share2 :
+                step.value === 'configure_apis' ? Settings :
+                step.value === 'add_trigger' ? Zap :
+                Sparkles
+        }));
 
-      addMessage({
-        role: 'assistant',
-        content: 'What would you like to do next? Choose an option or tell me what you need:',
-        options: options,
-      });
+        addMessage({
+          role: 'assistant',
+          content: 'What would you like to do next? Choose an option or tell me what you need:',
+          options: options,
+        });
+      }
     } catch (error) {
       console.error('Error generating workflow:', error);
       addMessage({
@@ -212,8 +206,17 @@ export function SimplifiedWorkflowChat({
     setIsLoading(true);
     
     try {
+      // Detect if working with video workflow
+      const isVideoWorkflow = currentWorkflow?.name?.toLowerCase().includes('video') ||
+                             option.label.toLowerCase().includes('video') ||
+                             option.value === 'configure_apis';
+      
+      const apiEndpoint = isVideoWorkflow 
+        ? '/api/ai/generate-video-workflow' 
+        : '/api/ai/generate-simple-workflow';
+
       // Call API with option selection
-      const response = await fetch('/api/ai/generate-simple-workflow', {
+      const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -288,8 +291,19 @@ export function SimplifiedWorkflowChat({
     setIsLoading(true);
     
     try {
+      // Detect if this is a video production workflow request
+      const isVideoWorkflow = userInput.toLowerCase().includes('video') || 
+                             userInput.toLowerCase().includes('youtube') ||
+                             userInput.toLowerCase().includes('ai-generated') ||
+                             userInput.toLowerCase().includes('automate') && userInput.toLowerCase().includes('production') ||
+                             currentWorkflow?.name?.toLowerCase().includes('video');
+
+      const apiEndpoint = isVideoWorkflow 
+        ? '/api/ai/generate-video-workflow' 
+        : '/api/ai/generate-simple-workflow';
+
       // Call API with context
-      const response = await fetch('/api/ai/generate-simple-workflow', {
+      const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
