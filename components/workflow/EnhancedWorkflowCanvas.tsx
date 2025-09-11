@@ -350,10 +350,10 @@ function WorkflowCanvasContent({
               <Card className="p-3 max-w-sm">
                 <div className="flex items-center gap-2 mb-2">
                   <Info className="h-4 w-4 text-primary" />
-                  <h3 className="text-sm font-medium">Node: {selectedNode.data.label}</h3>
+                  <h3 className="text-sm font-medium">Node: {selectedNode.data?.label as string || 'Unnamed'}</h3>
                 </div>
                 <div className="space-y-1 text-xs text-muted-foreground">
-                  <p>Type: {selectedNode.data.type}</p>
+                  <p>Type: {selectedNode.data?.type as string || 'Unknown'}</p>
                   <p>ID: {selectedNode.id}</p>
                   <p>Position: ({Math.round(selectedNode.position.x)}, {Math.round(selectedNode.position.y)})</p>
                 </div>
