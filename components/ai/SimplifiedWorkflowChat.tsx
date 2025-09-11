@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { VoiceChat } from './VoiceChat';
 import {
   Send,
   Bot,
@@ -32,6 +33,8 @@ import {
   CheckCircle,
   ArrowRight,
   Loader2,
+  Mic,
+  Keyboard,
 } from 'lucide-react';
 
 interface WorkflowNode {
@@ -81,6 +84,8 @@ export function SimplifiedWorkflowChat({
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [currentWorkflow, setCurrentWorkflow] = useState<any>(null);
+  const [inputMode, setInputMode] = useState<'text' | 'voice'>('text');
+  const [lastAiResponse, setLastAiResponse] = useState<string>('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Generate initial workflow when component mounts with an idea
@@ -139,17 +144,20 @@ export function SimplifiedWorkflowChat({
           role: 'assistant',
           content: data.message,
         });
+        setLastAiResponse(data.message);
       }
 
       // Only use the workflow if it exists
       if (data.workflow) {
         const workflow = data.workflow;
         
+        const message = data.message || 'Here\'s your initial workflow! I\'ve created a structure that we can customize together.';
         addMessage({
           role: 'assistant',
-          content: data.message || 'Here\'s your initial workflow! I\'ve created a structure that we can customize together.',
+          content: message,
           workflow: workflow,
         });
+        setLastAiResponse(message);
 
         setCurrentWorkflow(workflow);
         if (onWorkflowGenerated) {
@@ -345,6 +353,33 @@ export function SimplifiedWorkflowChat({
     }
   };
 
+  // Handle voice input
+  const handleVoiceTranscript = (transcript: string) => {
+    setInput(transcript);
+    // Auto-send after a pause in speech
+    setTimeout(() => {
+      if (transcript.trim()) {
+        handleSendMessage();
+      }
+    }, 1500);
+  };
+
+  // Handle voice commands
+  const handleVoiceCommand = (command: string) => {
+    switch(command) {
+      case 'create_workflow':
+        setInput('Create a new workflow');
+        handleSendMessage();
+        break;
+      case 'help':
+        setInput('What can you help me with?');
+        handleSendMessage();
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <Card className="h-full flex flex-col">
       {/* Header */}
@@ -468,24 +503,56 @@ export function SimplifiedWorkflowChat({
       </ScrollArea>
 
       {/* Input */}
-      <div className="p-4 border-t">
-        <div className="flex gap-2">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder="Ask me anything about your workflow..."
-            disabled={isLoading}
-            className="flex-1"
-          />
+      <div className="p-4 border-t space-y-3">
+        {/* Input Mode Toggle */}
+        <div className="flex justify-center gap-1">
           <Button
-            onClick={handleSendMessage}
-            disabled={!input.trim() || isLoading}
-            size="icon"
+            variant={inputMode === 'text' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setInputMode('text')}
+            className="text-xs"
           >
-            <Send className="h-4 w-4" />
+            <Keyboard className="h-3 w-3 mr-1" />
+            Type
+          </Button>
+          <Button
+            variant={inputMode === 'voice' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setInputMode('voice')}
+            className="text-xs"
+          >
+            <Mic className="h-3 w-3 mr-1" />
+            Speak
           </Button>
         </div>
+
+        {/* Input Area */}
+        {inputMode === 'text' ? (
+          <div className="flex gap-2">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              placeholder="Describe what you want to automate..."
+              disabled={isLoading}
+              className="flex-1"
+            />
+            <Button
+              onClick={handleSendMessage}
+              disabled={!input.trim() || isLoading}
+              size="icon"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
+          </div>
+        ) : (
+          <VoiceChat
+            onTranscript={handleVoiceTranscript}
+            onVoiceCommand={handleVoiceCommand}
+            aiResponse={lastAiResponse}
+            isProcessing={isLoading}
+          />
+        )}
         
         {/* Quick Actions */}
         <div className="flex gap-2 mt-3">
