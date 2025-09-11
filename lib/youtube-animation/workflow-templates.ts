@@ -10,6 +10,10 @@ export interface ContentAnalysis {
   keywords: string[];
   sentiment: string;
   topics: string[];
+  type?: 'breaking_news' | 'tutorial' | 'analysis';
+  urgency?: 'high' | 'medium' | 'low';
+  technicalLevel?: 'beginner' | 'intermediate' | 'advanced';
+  targetAudience?: 'general' | 'technical';
 }
 
 export interface AnimationTemplate {
