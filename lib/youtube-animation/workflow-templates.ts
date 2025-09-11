@@ -17,6 +17,7 @@ export interface AnimationTemplate {
   style: any;
   animations: any[];
   transitions: any[];
+  duration?: number;
 }
 
 export const aiRevolutionTemplate: AnimationTemplate = {
