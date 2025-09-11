@@ -412,17 +412,30 @@ export function SimplifiedWorkflowChat({
                       {message.options.map((option, idx) => {
                         const Icon = option.icon;
                         return (
-                          <Button
+                          <div
                             key={idx}
-                            variant="outline"
-                            size="sm"
-                            className="w-full justify-start"
-                            onClick={() => handleOptionClick(option)}
-                            disabled={isLoading}
+                            className="border rounded-lg p-3 hover:bg-accent/50 cursor-pointer transition-colors"
+                            onClick={() => !isLoading && handleOptionClick(option)}
                           >
-                            {Icon && <Icon className="h-4 w-4 mr-2" />}
-                            <span>{option.label}</span>
-                          </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="w-full justify-start p-0 h-auto hover:bg-transparent"
+                              disabled={isLoading}
+                            >
+                              <div className="flex flex-col items-start w-full text-left">
+                                <div className="flex items-center gap-2 font-medium">
+                                  {Icon && <Icon className="h-4 w-4" />}
+                                  <span>{option.label}</span>
+                                </div>
+                                {option.description && (
+                                  <p className="text-xs text-muted-foreground mt-1 font-normal">
+                                    {option.description}
+                                  </p>
+                                )}
+                              </div>
+                            </Button>
+                          </div>
                         );
                       })}
                     </div>

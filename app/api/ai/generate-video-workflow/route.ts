@@ -378,27 +378,27 @@ return scenes.map((scene, index) => ({
         executionOrder: "v1"
       }
     },
-    message: "I've created a complete AI video production workflow! This pipeline will automatically generate videos from ideas in your Google Sheet.",
+    message: "🎬 I've created a complete AI video production workflow! This automated pipeline will:\n\n1. **Monitor Google Sheets** for new video ideas\n2. **Generate Scripts** using AI to expand your ideas into compelling narratives\n3. **Create Video Content** with AI-powered video generation (Replicate/Runway)\n4. **Generate Voiceovers** with natural-sounding AI voices (ElevenLabs)\n5. **Assemble Everything** using FFmpeg to create the final video\n6. **Publish to YouTube** automatically with optimized metadata\n\nThis workflow can produce professional videos without any manual editing!",
     nextSteps: [
       {
-        label: "Configure API Keys",
+        label: "🔑 Configure API Keys",
         value: "configure_apis",
-        description: "Set up OpenAI, Replicate, ElevenLabs, and YouTube credentials"
+        description: "Essential first step! Connect your OpenAI (for scripts), ElevenLabs (for voice), Replicate (for videos), and YouTube accounts. Without these, the workflow can't generate content."
       },
       {
-        label: "Customize Script Prompt",
+        label: "✏️ Customize Video Style",
         value: "customize_script",
-        description: "Adjust how the AI generates video scripts"
+        description: "Define your video's personality - tone of voice, visual style, target audience. This ensures consistent branding across all generated videos."
       },
       {
-        label: "Add Quality Controls",
+        label: "👁️ Add Human Review",
         value: "add_qa",
-        description: "Add review steps before publishing"
+        description: "Add approval checkpoints before publishing. Great for maintaining quality - the workflow will pause for your review before going live."
       },
       {
-        label: "Test with Sample",
+        label: "🚀 Test with Real Example",
         value: "test",
-        description: "Run a test with a sample video idea"
+        description: "Try it out! I'll walk you through generating your first video from idea to YouTube upload. We'll use a simple test topic to ensure everything works."
       }
     ]
   };

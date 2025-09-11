@@ -4,6 +4,7 @@ import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { SimplifiedWorkflowChat } from '@/components/ai/SimplifiedWorkflowChat';
+import { SimpleWorkflowVisualizer } from '@/components/workflow/SimpleWorkflowVisualizer';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -116,22 +117,9 @@ function WorkflowBuilderContent() {
               </div>
 
               {/* Canvas Area */}
-              <div className="flex-1 p-6">
+              <div className="flex-1 p-6 overflow-hidden">
                 {viewMode === 'visual' ? (
-                  <div className="h-full flex items-center justify-center">
-                    <div className="text-center space-y-4">
-                      <div className="p-4 bg-primary/10 rounded-full w-fit mx-auto">
-                        <Workflow className="h-12 w-12 text-primary" />
-                      </div>
-                      <h4 className="text-lg font-medium">Visual Workflow Builder</h4>
-                      <p className="text-sm text-muted-foreground max-w-sm">
-                        Your workflow will be displayed here visually as you build it with the AI assistant
-                      </p>
-                      <Badge variant="secondary">
-                        Canvas Integration Coming Soon
-                      </Badge>
-                    </div>
-                  </div>
+                  <SimpleWorkflowVisualizer workflow={currentWorkflow} />
                 ) : (
                   <div className="h-full">
                     <pre className="h-full overflow-auto p-4 bg-muted/30 rounded-lg text-sm">

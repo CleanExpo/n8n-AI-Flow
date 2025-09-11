@@ -140,24 +140,24 @@ export async function POST(request: NextRequest) {
         explanation: `I'll help you create a workflow for: ${idea}`,
         nextSteps: [
           {
-            label: "Add trigger",
+            label: "⚡ Choose Trigger Type",
             value: "add_trigger",
-            description: "Configure when this workflow should run"
+            description: "How should this workflow start? Options include: scheduled (run at specific times), webhook (triggered by external apps), manual (run on-demand), or when data changes in Google Sheets, databases, etc."
           },
           {
-            label: "Add processing",
+            label: "🔧 Add Data Processing",
             value: "add_processing",
-            description: "Add data transformation steps"
+            description: "Transform and manipulate your data - filter results, format text, calculate values, merge data from multiple sources, or use AI to analyze and enhance content."
           },
           {
-            label: "Add output",
+            label: "📤 Set Up Output",
             value: "add_output",
-            description: "Configure where to send results"
+            description: "Where should the results go? Send emails, post to Slack, update databases, create files in Google Drive, or send data to any API endpoint."
           },
           {
-            label: "Test workflow",
+            label: "🧪 Test with Sample Data",
             value: "test",
-            description: "Run with sample data"
+            description: "Let's run your workflow with example data to see it in action. I'll show you exactly what happens at each step and help fix any issues."
           }
         ]
       };
@@ -211,19 +211,19 @@ export async function POST(request: NextRequest) {
       explanation: "I've created a basic workflow template. Let's customize it for your specific needs.",
       nextSteps: [
         {
-          label: "Describe your use case",
+          label: "📝 Describe Your Use Case",
           value: "describe_more",
-          description: "Tell me more about what you want to automate"
+          description: "Tell me more about what you want to automate. For example: 'I want to monitor my emails and save attachments to Google Drive' or 'I need to sync data between my CRM and spreadsheet daily'."
         },
         {
-          label: "Add nodes",
+          label: "➕ Add Workflow Steps",
           value: "add_nodes",
-          description: "Add specific functionality"
+          description: "Let's add specific functionality to your workflow. I can help you connect to services like Gmail, Slack, databases, AI models, or any API you need."
         },
         {
-          label: "Configure trigger",
+          label: "🎯 Set Up Your Trigger",
           value: "configure_trigger",
-          description: "Set up how to start the workflow"
+          description: "Choose how your workflow should start - on a schedule, when receiving data, manually, or when something specific happens in another app."
         }
       ],
       error: error.message
