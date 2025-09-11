@@ -24,7 +24,7 @@ export default function WorkflowBuilderPage() {
   const searchParams = useSearchParams();
   const idea = searchParams.get('idea') || '';
   const [viewMode, setViewMode] = useState<'visual' | 'code'>('visual');
-  const [currentWorkflow, setCurrentWorkflow] = useState(null);
+  const [currentWorkflow, setCurrentWorkflow] = useState<any>(null);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
