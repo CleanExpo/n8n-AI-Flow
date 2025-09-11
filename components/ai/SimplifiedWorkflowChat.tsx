@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { VoiceChat } from './VoiceChat';
+import { VoiceChatWithFallback } from './VoiceChatWithFallback';
 import {
   Send,
   Bot,
@@ -546,7 +546,7 @@ export function SimplifiedWorkflowChat({
             </Button>
           </div>
         ) : (
-          <VoiceChat
+          <VoiceChatWithFallback
             onTranscript={handleVoiceTranscript}
             onVoiceCommand={handleVoiceCommand}
             aiResponse={lastAiResponse}
