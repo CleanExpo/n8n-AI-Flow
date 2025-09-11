@@ -68,6 +68,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if OpenAI API key is available
+    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'dummy-key-for-build') {
+      // Generate workflow without OpenAI
+      const generatedWorkflow = WorkflowGenerator.generateWorkflow(idea);
+      
+      return NextResponse.json({
+        workflow: generatedWorkflow,
+        explanation: `I've created a workflow based on your request: "${idea}". This workflow includes the necessary nodes to accomplish your automation task.`,
+        nextSteps: [
+          {
+            label: "⚡ Choose Trigger Type",
+            value: "add_trigger",
+            description: "How should this workflow start? Options include: scheduled (run at specific times), webhook (triggered by external apps), manual (run on-demand), or when data changes in Google Sheets, databases, etc."
+          },
+          {
+            label: "🔧 Add Data Processing",
+            value: "add_processing",
+            description: "Transform and manipulate your data - filter results, format text, calculate values, merge data from multiple sources, or use AI to analyze and enhance content."
+          },
+          {
+            label: "📤 Set Up Output",
+            value: "add_output",
+            description: "Where should the results go? Send emails, post to Slack, update databases, create files in Google Drive, or send data to any API endpoint."
+          },
+          {
+            label: "🧪 Test with Sample Data",
+            value: "test",
+            description: "Let's run your workflow with example data to see it in action. I'll show you exactly what happens at each step and help fix any issues."
+          }
+        ]
+      });
+    }
+
     const userPrompt = context 
       ? `Previous context: ${JSON.stringify(context)}\n\nNew request: ${idea}`
       : `Create a workflow for: ${idea}`;

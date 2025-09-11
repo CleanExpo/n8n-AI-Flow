@@ -131,6 +131,16 @@ export async function POST(req: NextRequest) {
                            idea.toLowerCase().includes('ai-generated') ||
                            idea.toLowerCase().includes('automate') && idea.toLowerCase().includes('production');
 
+    // Check if OpenAI API key is available
+    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'dummy-key-for-build') {
+      // Generate video workflow without OpenAI if it's a video request
+      if (isVideoWorkflow) {
+        return NextResponse.json(createVideoProductionTemplate(idea));
+      }
+      // Otherwise return a basic workflow
+      return NextResponse.json(createBasicWorkflowTemplate(idea));
+    }
+
     // Use video-specific prompt for video workflows
     const systemPrompt = isVideoWorkflow ? VIDEO_WORKFLOW_PROMPT : SYSTEM_PROMPT;
     
