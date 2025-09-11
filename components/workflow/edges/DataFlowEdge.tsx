@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { EdgeProps, getBezierPath, EdgeLabelRenderer, BaseEdge } from 'reactflow';
+import { EdgeProps, getBezierPath, EdgeLabelRenderer, BaseEdge } from '@xyflow/react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface DataFlowEdgeProps extends EdgeProps {

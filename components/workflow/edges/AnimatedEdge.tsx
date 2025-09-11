@@ -1,5 +1,5 @@
 import React from 'react';
-import { EdgeProps, getBezierPath, EdgeLabelRenderer, BaseEdge } from 'reactflow';
+import { EdgeProps, getBezierPath, EdgeLabelRenderer, BaseEdge } from '@xyflow/react';
 import { motion } from 'framer-motion';
 
 export function AnimatedEdge({
